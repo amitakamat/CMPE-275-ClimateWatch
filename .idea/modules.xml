@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ClimateWatch/GrpcJava.iml" filepath="$PROJECT_DIR$/ClimateWatch/GrpcJava.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PubSubSystem/PubSubSystem-master.iml" filepath="$PROJECT_DIR$/PubSubSystem/PubSubSystem-master.iml" />
+    </modules>
+  </component>
+</project>
