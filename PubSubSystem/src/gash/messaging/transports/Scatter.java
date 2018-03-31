@@ -82,8 +82,8 @@ public class Scatter implements MessageTransport<Message> {
 	protected void forwardMessage(Message msg) {
 		ReceiverNode n = nodes.get(msg.getDestination());
 		//System.out.println("forwarded to " + n.getNodeId()+" on port "+n.mc.commConnection.port);
-		n.mc.postMessage("Hey from "+n.mc.commConnection.channel.channel().localAddress());
-		n.message(msg);
+		n.mc.postMessage(msg.getMessage());
+		//n.message(msg);
 	}
 
 	@Override
