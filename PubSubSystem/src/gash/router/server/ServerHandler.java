@@ -17,9 +17,17 @@ package gash.router.server;
 
 import java.beans.Beans;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 
 import gash.router.container.RoutingConf;
 import gash.router.server.resources.RouteResource;
@@ -38,12 +46,26 @@ import routing.Pipe.Route;
  */
 public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 	protected static Logger logger = LoggerFactory.getLogger("connect");
+	protected static MongoClient mongoClient;
+	protected static DBCollection dbCollection;
 
 	private HashMap<String, String> routing;
 
 	public ServerHandler(RoutingConf conf) {
 		if (conf != null)
 			routing = conf.asHashMap();
+		
+		if (mongoClient == null) {
+			try {
+				//mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+				mongoClient = new MongoClient("localhost", 27017);
+				DB messageDB = mongoClient.getDB("messagesDB");
+				dbCollection = messageDB.getCollection("messages");
+			}
+			catch(Exception e) {
+				System.out.println(e.getMessage());
+			}
+}
 	}
 
 	/**
@@ -73,6 +95,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 						Route.Builder rb = Route.newBuilder(msg);
 						rb.setPayload(reply);
 						channel.write(rb.build());
+						
+						String uniqueID = UUID.randomUUID().toString();					
+						DBObject messageObject = new BasicDBObject("_id", uniqueID).append("messageID", msg.getId()).append("payload", msg.getPayload());
+						System.out.println(msg.getAllFields().toString());
+						dbCollection.insert(messageObject);
 					}
 				} catch (Exception e) {
 					// TODO add logging

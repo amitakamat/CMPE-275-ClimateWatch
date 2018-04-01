@@ -28,7 +28,7 @@ public class MessageApp {
 	 */
 	public static void main(String[] args) {
 
-		File cf = new File("PubSubSystem/resources/routing.conf");
+		File cf = new File("resources/routing.conf");
 		try {
 			MessageServer svr = new MessageServer(cf);
 			svr.startServer();
