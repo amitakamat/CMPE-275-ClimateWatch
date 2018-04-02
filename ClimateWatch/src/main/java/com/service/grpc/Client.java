@@ -57,8 +57,10 @@ public class Client
       
       CommunicationServiceOuterClass.QueryParams queryParams =
 		      CommunicationServiceOuterClass.QueryParams.newBuilder()
-		      		  .setFromUtc("01/01/2011")
-		      		  .setToUtc("12/31/2013")
+		      		  .setFromUtc("2011/01/01 00:00:00")
+		      		  .setToUtc("2013/01/01 00:00:00")
+		      		//.setFromUtc("2017/01/01 00:00:00") *** Test for data not present
+		      		// .setToUtc("2018/01/01 00:00:00")
 		      		  .build();
       
       

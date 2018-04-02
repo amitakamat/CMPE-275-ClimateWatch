@@ -14,11 +14,28 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
 import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommunicationServiceImpl extends CommunicationServiceGrpc.CommunicationServiceImplBase {   
-     
+	protected static MongoClient mongoClient;
+	protected static DBCollection dbCollection; 
+	
+	public CommunicationServiceImpl() {
+		if (mongoClient == null) {
+			try {
+				//mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+				mongoClient = new MongoClient("localhost", 27017);
+				DB messageDB = mongoClient.getDB("messagesDB");
+				dbCollection = messageDB.getCollection("messages");
+			}
+			catch(Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}
+	 }
+	
 	@Override
      public void messageHandler(CommunicationServiceOuterClass.Request request,
            StreamObserver<CommunicationServiceOuterClass.Response> responseObserver) {
@@ -34,8 +51,14 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
     	   successMsg = "Put call Successfull";
     	   //System.out.println(request.getPutRequest().toString().length());
        }
-       else
+       else {
     	   successMsg = "Get call Successfull";
+    	   CommunicationServiceOuterClass.QueryParams params = request.getGetRequest().getQueryParams();
+    	   if (queryDB(params.getFromUtc(), params.getToUtc()))
+    		   successMsg = "Data present";
+    	   else
+    		   successMsg = "Data not present";
+       }	   
        
        CommunicationServiceOuterClass.MetaData metadata =
     		      CommunicationServiceOuterClass.MetaData.newBuilder()
@@ -59,4 +82,32 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
        responseObserver.onNext(response);
        responseObserver.onCompleted();
      }
+	
+	/**
+	 * a message was received from the server. Here we extract the from and to date time,
+	 * query the database to fetch records based on the query and display it.
+	 * 
+	 * @param from, to
+	 *            The message request parameters received
+	 */
+	public boolean queryDB(String from, String to) {
+		boolean found = false;
+		try {
+		Date fromTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(from);
+		Date toTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(to);
+		
+		BasicDBObject query = new BasicDBObject("time", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
+		DBCursor cursor = dbCollection.find(query);
+		while(cursor.hasNext()) {
+			found = true;
+	        System.out.println(cursor.next());
+	    }
+		return found;
+		}
+		catch(Exception ex) {
+			System.out.println(ex.getMessage());
+			return false;
+		}
+
+	}
 }
