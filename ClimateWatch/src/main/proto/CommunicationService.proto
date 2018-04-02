@@ -3,148 +3,55 @@ package com.service.grpc;
 
 option optimize_for = SPEED;
 
-// ┌────────────┐
-// │ Header |
-// └────────────┘
-message Header {
- //===================================================
- // fromIp: sender ip
- // you should fill this field with your ip
- //===================================================
- string fromIp = 1;
+message Request {
+  string fromSender = 1;
+  string toReceiver = 2;
+  string originalSender = 3;
 
- //===================================================
- // toIp: receiver ip
- // you should fill this field with the receiver ip
- //===================================================
- string toIp = 2;
+  oneof payload {
+    PingRequest ping = 6;
+    PutRequest putRequest = 7;
+    GetRequest getRequest = 8;
+  }
 
- //===================================================
- // originalIp: original sender ip
- // if you receive this message and you ARE NOT the receiver
- // save the original sender ip here
- // and forward it to the nodes you know
- // if you receive this message and you ARE the receiver
- // send message directly to sender using originalIp
- //===================================================
- string originalIp = 3;
-
- //===================================================
- // the max: number of hop this message can take
- // please set this to a number that is just large enought
- //===================================================
- int32 maxHop = 4;
-
- //===================================================
- // type: type of this message
- //===================================================
- oneof type {
- bool heartBeat = 5; // just let the receiver know you're still alive
- Ping ping = 6;
- PutRequest putRequest = 7;
- GetRequest getRequest = 8;
- Data data = 9;
- int32 errorCode = 10;
- }
-
- //===================================================
- // token: auth token or secret
- // use this to avoid msg leak to other teams
- //===================================================
- string token = 11;
 }
 
-// ┌──────────┐
-// │ Ping |
-// └──────────┘
-message Ping {
- //===================================================
- // type: type of ping
- // request: set this if you send the ping
- // respond: set this if you are responding to a ping
- //===================================================
- oneof type {
- bool request = 1; // require a respond
- bool respond = 2; // don't need to respond
- }
+message Response {
+  bool isSuccess = 1; // PingRequest will only use this field if succeeded
+  string msg = 2;
+  MetaData metaData = 3;
+  DatFragment datFragment = 4;
 }
 
-// ┌────────────────┐
-// │ PutRequest |
-// └────────────────┘
+message PingRequest {
+  string msg = 1; // optional
+}
+
 message PutRequest {
- Data data = 1;
+  MetaData metaData = 1;
+  DatFragment datFragment = 2;
 }
 
-// ┌────────────────┐
-// │ GetRequest |
-// └────────────────┘
 message GetRequest {
- string getQuery = 1;
+  MetaData metaData = 1;
+  QueryParams queryParams = 2;
 }
 
-// ┌──────────┐
-// │ Data |
-// └──────────┘
-message Data {
- oneof dataType {
- MetaData metaData = 1;
- DatFragment datFragment = 2;
- }
+message QueryParams {
+  string from_utc = 1;
+  string to_utc = 2;
 }
 
-// ┌──────────────┐
-// │ MetaData |
-// └──────────────┘
 message MetaData {
- int32 dataSize = 1;
- int32 numOfFragment = 2;
+  string uuid = 1;
+  int32 numOfFragment = 2;
+  int32 mediaType = 3;
 }
 
-// ┌─────────────────┐
-// │ DatFragment |
-// └─────────────────┘
 message DatFragment {
- //===================================================
- // dataId: this number combine with sender ip should create
- // a unique id for a data/file
- // use to id which data/file this fragment belong to
- //===================================================
- int32 dataId = 1;
-
- //===================================================
- // fragmentId: this number combine with dataId and sender ip
- // should create a unique id for this fragment
- //===================================================
- int32 fragmentId = 2;
-
- //===================================================
- // data: the data as byte array
- //===================================================
- bytes data = 3;
+  bytes data = 1;
 }
 
-//=====================================================
-//THINGS BELOW HERE IS FOR TESTING PURPOSE
-//=====================================================
-// Request payload
-message TransferDataRequest {
-  string fromtimestamp = 1;
-  string totimestamp = 2;
-}
-
-message TransferDataResponse {
-  string communication = 1;
-  string data = 2;
-}
-
-//=====================================================
-//GRPC services
-//=====================================================
-// Defining a Service, a Service can have multiple RPC operations
 service CommunicationService {
-  // Define a RPC operation
-  rpc communication(TransferDataRequest) returns (TransferDataResponse);
-  rpc pingHandler(Ping) returns (Ping);
-  rpc messageHandler(Header) returns (Header);
+  rpc MessageHandler(Request) returns (Response);
 }

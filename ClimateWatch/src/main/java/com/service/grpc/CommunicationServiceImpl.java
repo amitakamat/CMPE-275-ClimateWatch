@@ -17,55 +17,43 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommunicationServiceImpl extends CommunicationServiceGrpc.CommunicationServiceImplBase {
-  @Override
-  public void communication(CommunicationServiceOuterClass.TransferDataRequest request,
-        StreamObserver<CommunicationServiceOuterClass.TransferDataResponse> responseObserver) {
-
-    System.out.println("Data request from " + request.getFromtimestamp() + " to " + request.getTotimestamp());
-
-    CommunicationServiceOuterClass.TransferDataResponse response = CommunicationServiceOuterClass.TransferDataResponse.newBuilder()
-      .setCommunication("Communication setup successfully, " + request.getFromtimestamp() + " " + request.getTotimestamp())
-      .setData("Yes")
-      .build();
-
-    responseObserver.onNext(response);
-    responseObserver.onCompleted();
-  }
-
-    @Override
-    public void pingHandler(CommunicationServiceOuterClass.Ping request,
-          StreamObserver<CommunicationServiceOuterClass.Ping> responseObserver) {
-
-            System.out.println("Received a ping request");
-
-            CommunicationServiceOuterClass.Ping response =
-            CommunicationServiceOuterClass.Ping.newBuilder()
-                .setRespond(true)
-                .build();
-
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-    }
-   
-     @Override
-     public void messageHandler(CommunicationServiceOuterClass.Header request,
-           StreamObserver<CommunicationServiceOuterClass.Header> responseObserver) {
+public class CommunicationServiceImpl extends CommunicationServiceGrpc.CommunicationServiceImplBase {   
+     
+	@Override
+     public void messageHandler(CommunicationServiceOuterClass.Request request,
+           StreamObserver<CommunicationServiceOuterClass.Response> responseObserver) {
      // CommunicationRequest has toString auto-generated.
 
        System.out.println("Received a header request");
-       CommunicationServiceOuterClass.Ping pingResponse =
-    		      CommunicationServiceOuterClass.Ping.newBuilder()
-    		          .setRequest(true)
+       String successMsg = "";
+       if(request.getPing().toString().length() != 0) {
+    	   successMsg = "Ping Successfull";
+    	  // System.out.println(request.getPing().toString().length());
+       }
+       else if(request.getPutRequest().toString().length() != 0) {
+    	   successMsg = "Put call Successfull";
+    	   //System.out.println(request.getPutRequest().toString().length());
+       }
+       else
+    	   successMsg = "Get call Successfull";
+       
+       CommunicationServiceOuterClass.MetaData metadata =
+    		      CommunicationServiceOuterClass.MetaData.newBuilder()
+    		          .setUuid("12345")
+    		          .setNumOfFragment(1)
+    		          .setMediaType(3)
     		          .build();
+       
+       CommunicationServiceOuterClass.DatFragment dataFragment =
+ 		      CommunicationServiceOuterClass.DatFragment.newBuilder()
+ 		      		  .setData(ByteString.copyFromUtf8("sample raw bytes"))
+ 		      		  .build();
 
-       CommunicationServiceOuterClass.Header response = CommunicationServiceOuterClass.Header.newBuilder()
-    	          .setFromIp("Sender IP")
-    	          .setToIp("Receiver IP")
-    	          .setOriginalIp("Original IP")
-    	          .setMaxHop(5)
-    	          .setPing(pingResponse)
-    	          .setToken("1234567890")
+       CommunicationServiceOuterClass.Response response = CommunicationServiceOuterClass.Response.newBuilder()
+    	          .setIsSuccess(true)
+    	          .setMsg(successMsg)
+    	          .setMetaData(metadata)
+    	          .setDatFragment(dataFragment)
     	          .build();
 
        responseObserver.onNext(response);
