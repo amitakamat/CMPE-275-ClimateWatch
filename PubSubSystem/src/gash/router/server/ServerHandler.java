@@ -16,6 +16,8 @@
 package gash.router.server;
 
 import java.beans.Beans;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -95,11 +98,16 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 						Route.Builder rb = Route.newBuilder(msg);
 						rb.setPayload(reply);
 						channel.write(rb.build());
+
+						// Uncomment to query the database.
+						queryDB(msg.getPayload());
 						
-						String uniqueID = UUID.randomUUID().toString();					
+						
+						// Code to insert data in mongoDB
+						/*String uniqueID = UUID.randomUUID().toString();					
 						DBObject messageObject = new BasicDBObject("_id", uniqueID).append("messageID", msg.getId()).append("payload", msg.getPayload());
 						System.out.println(msg.getAllFields().toString());
-						dbCollection.insert(messageObject);
+						dbCollection.insert(messageObject);*/
 					}
 				} catch (Exception e) {
 					// TODO add logging
@@ -119,6 +127,32 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 		System.out.flush();
 	}
 
+	/**
+	 * a message was received from the server. Here we extract the from and to date time,
+	 * query the database to fetch records based on the query and display it.
+	 * 
+	 * @param payload
+	 *            The message payload received
+	 */
+	public void queryDB(String payload) {
+		// Assuming we get from and to date in a single message divided by ',' 
+		String[] filters = payload.split(",");
+		try {
+		Date fromTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(filters[0]);
+		Date toTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(filters[1]);
+		
+		BasicDBObject query = new BasicDBObject("time", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
+		DBCursor cursor = dbCollection.find(query);
+		while(cursor.hasNext()) {
+	        System.out.println(cursor.next());
+	    }
+		
+		}
+		catch(Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+	
 	/**
 	 * a message was received from the server. Here we dispatch the message to
 	 * the client's thread pool to minimize the time it takes to process other

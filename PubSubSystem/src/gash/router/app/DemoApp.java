@@ -65,6 +65,11 @@ public class DemoApp implements CommListener {
 		System.out.println("");
 	}
 
+	
+	private void queryData(String query) {
+		mc.postMessage(query);
+	}
+	
 	@Override
 	public String getListenerID() {
 		return "demo";
@@ -90,6 +95,9 @@ public class DemoApp implements CommListener {
 
 			// do stuff w/ the connection
 			da.ping(10);
+			
+			//Uncomment below line to test querying the db.
+			//da.queryData("2011/01/01 00:00:00,2013/01/01 00:00:00");
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();

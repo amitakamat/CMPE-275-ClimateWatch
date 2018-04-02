@@ -5,5 +5,29 @@ Navigate to ClimateWatch folder.
   
 To run Server code : mvn package exec:java -Dexec.mainClass=com.service.grpc.App  
   
-To run Client code : mvn package exec:java -Dexec.mainClass=com.service.grpc.Client
+To run Client code : mvn package exec:java -Dexec.mainClass=com.service.grpc.Client  
+  
+  
+*** For testing purposes only ***  
+Run the following commands(test dataset) in Mongo DB to test the querying functionality
+use messagesDB
+db.createCollection("messages")
+db.messages.insert([  
+{ "_id" : "25f9865d-8a4e-4205-8e99-7b9dbb95d2b4", "time" : new Date("2011-01-01T16:00:00Z"), "data" : "sample data" },  
+{ "_id" : "b54523f1-44b6-42d7-ac18-6e3d6863bc93", "time" : new Date("2011-01-02T12:00:00Z"), "data" : "sample data" },  
+{ "_id" : "4026f4d5-1d2c-40e1-a32f-e04c54cb69a5", "time" : new Date("2012-05-03T16:00:00Z"), "data" : "sample data" },  
+{ "_id" : "ffe1f3e0-d6b8-4121-944e-0852f86745b3", "time" : new Date("2011-07-05T16:00:00Z"), "data" : "sample data" },  
+{ "_id" : "5fef460a-2c4f-40f3-888c-6e5b7d01eb27", "time" : new Date("2012-11-04T16:00:00Z"), "data" : "sample data" },  
+{ "_id" : "6e13367e-5141-41f1-8db4-674ba0a2dce8", "time" : new Date("2011-03-22T16:00:00Z"), "data" : "sample data" },  
+{ "_id" : "7f513858-14ac-40d3-b65a-d2efc84513fa", "time" : new Date("2012-01-13T16:00:00Z"), "data" : "sample data" },  
+{ "_id" : "b796d29a-9b45-4bf5-abc0-dde42c1be56a", "time" : new Date("2013-03-07T16:00:00Z"), "data" : "sample data" },  
+{ "_id" : "83ef461f-5ff2-46b3-91e5-8ce8f25eb605", "time" : new Date("2014-09-19T16:00:00Z"), "data" : "sample data" },  
+{ "_id" : "5b298454-cdbb-47eb-9a3d-9af8bd18bad9", "time" : new Date("2015-10-05T16:00:00Z"), "data" : "sample data" }  
+])  
+  
+  
+db.messages.find( { "time": { $gte: new Date("2011-01-01T00:00:00Z"), $lte: new Date("2013-01-01T00:00:00Z") } } );
+
+
+
 
