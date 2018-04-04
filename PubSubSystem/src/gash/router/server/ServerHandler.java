@@ -34,9 +34,14 @@ import com.mongodb.MongoClientURI;
 
 import gash.router.container.RoutingConf;
 import gash.router.server.resources.RouteResource;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.CharsetUtil;
 import routing.Pipe.Route;
 
 /**
@@ -47,7 +52,7 @@ import routing.Pipe.Route;
  * @author gash
  * 
  */
-public class ServerHandler extends SimpleChannelInboundHandler<Route> {
+public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ ChannelInboundHandlerAdapter {
 	protected static Logger logger = LoggerFactory.getLogger("connect");
 	protected static MongoClient mongoClient;
 	protected static DBCollection dbCollection;
@@ -163,7 +168,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 	 * @param msg
 	 *            The message
 	 */
-	@Override
+	/*@Override
 	protected void channelRead0(ChannelHandlerContext ctx, Route msg) throws Exception {
 		System.out.println("------------");
 		handleMessage(msg, ctx.channel());
@@ -173,6 +178,32 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		logger.error("Unexpected exception from downstream.", cause);
 		ctx.close();
-	}
+	}*/
+	
+	public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        //ByteBuf in = (ByteBuf) msg;
+        System.out.println(
+            "Server received: " + msg);//in.toString(CharsetUtil.UTF_8));
+       // ctx.writeAndFlush(Unpooled.copiedBuffer("Netty MAY JUNE rock!", CharsetUtil.UTF_8));
+        Route.Builder rb = Route.newBuilder();
+		rb.setId(10);
+		rb.setPath("/message");
+		rb.setPayload("Yo Yo Yo");
+        ctx.channel().writeAndFlush(rb.build());
+    }
+
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+    	Route.Builder rb = Route.newBuilder();
+		rb.setId(10);
+		rb.setPath("/message");
+		rb.setPayload("Yo Yo Yo");
+        ctx.writeAndFlush(rb.build())
+            .addListener(ChannelFutureListener.CLOSE);
+    }
+
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
+    }
 
 }
