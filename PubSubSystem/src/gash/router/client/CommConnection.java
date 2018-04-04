@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gash.router.server.ServerInit;
+import gash.router.server.ServerInitClientSide;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -155,7 +156,7 @@ public class CommConnection {
 
 		group = new NioEventLoopGroup();
 		try {
-			ServerInit si = new ServerInit(null, false);
+			ServerInitClientSide si = new ServerInitClientSide(null, false);
 			Bootstrap b = new Bootstrap();
 			b.group(group).channel(NioSocketChannel.class).handler(si);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
