@@ -29,16 +29,42 @@ public final class CommunicationServiceGrpc {
   // Static method descriptors that strictly reflect the proto.
   @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/1901")
   public static final io.grpc.MethodDescriptor<com.service.grpc.CommunicationServiceOuterClass.Request,
-      com.service.grpc.CommunicationServiceOuterClass.Response> METHOD_MESSAGE_HANDLER =
+      com.service.grpc.CommunicationServiceOuterClass.Response> METHOD_PUT_HANDLER =
       io.grpc.MethodDescriptor.<com.service.grpc.CommunicationServiceOuterClass.Request, com.service.grpc.CommunicationServiceOuterClass.Response>newBuilder()
-          .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+          .setType(io.grpc.MethodDescriptor.MethodType.CLIENT_STREAMING)
           .setFullMethodName(generateFullMethodName(
-              "com.service.grpc.CommunicationService", "MessageHandler"))
+              "com.service.grpc.CommunicationService", "PutHandler"))
           .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
               com.service.grpc.CommunicationServiceOuterClass.Request.getDefaultInstance()))
           .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
               com.service.grpc.CommunicationServiceOuterClass.Response.getDefaultInstance()))
-          .setSchemaDescriptor(new CommunicationServiceMethodDescriptorSupplier("MessageHandler"))
+          .setSchemaDescriptor(new CommunicationServiceMethodDescriptorSupplier("PutHandler"))
+          .build();
+  @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/1901")
+  public static final io.grpc.MethodDescriptor<com.service.grpc.CommunicationServiceOuterClass.Request,
+      com.service.grpc.CommunicationServiceOuterClass.Response> METHOD_GET_HANDLER =
+      io.grpc.MethodDescriptor.<com.service.grpc.CommunicationServiceOuterClass.Request, com.service.grpc.CommunicationServiceOuterClass.Response>newBuilder()
+          .setType(io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
+          .setFullMethodName(generateFullMethodName(
+              "com.service.grpc.CommunicationService", "GetHandler"))
+          .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+              com.service.grpc.CommunicationServiceOuterClass.Request.getDefaultInstance()))
+          .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+              com.service.grpc.CommunicationServiceOuterClass.Response.getDefaultInstance()))
+          .setSchemaDescriptor(new CommunicationServiceMethodDescriptorSupplier("GetHandler"))
+          .build();
+  @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/1901")
+  public static final io.grpc.MethodDescriptor<com.service.grpc.CommunicationServiceOuterClass.Request,
+      com.service.grpc.CommunicationServiceOuterClass.Response> METHOD_PING =
+      io.grpc.MethodDescriptor.<com.service.grpc.CommunicationServiceOuterClass.Request, com.service.grpc.CommunicationServiceOuterClass.Response>newBuilder()
+          .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+          .setFullMethodName(generateFullMethodName(
+              "com.service.grpc.CommunicationService", "Ping"))
+          .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+              com.service.grpc.CommunicationServiceOuterClass.Request.getDefaultInstance()))
+          .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+              com.service.grpc.CommunicationServiceOuterClass.Response.getDefaultInstance()))
+          .setSchemaDescriptor(new CommunicationServiceMethodDescriptorSupplier("Ping"))
           .build();
 
   /**
@@ -70,20 +96,48 @@ public final class CommunicationServiceGrpc {
 
     /**
      */
-    public void messageHandler(com.service.grpc.CommunicationServiceOuterClass.Request request,
+    public io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Request> putHandler(
         io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response> responseObserver) {
-      asyncUnimplementedUnaryCall(METHOD_MESSAGE_HANDLER, responseObserver);
+      return asyncUnimplementedStreamingCall(METHOD_PUT_HANDLER, responseObserver);
+    }
+
+    /**
+     */
+    public void getHandler(com.service.grpc.CommunicationServiceOuterClass.Request request,
+        io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response> responseObserver) {
+      asyncUnimplementedUnaryCall(METHOD_GET_HANDLER, responseObserver);
+    }
+
+    /**
+     */
+    public void ping(com.service.grpc.CommunicationServiceOuterClass.Request request,
+        io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response> responseObserver) {
+      asyncUnimplementedUnaryCall(METHOD_PING, responseObserver);
     }
 
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
-            METHOD_MESSAGE_HANDLER,
+            METHOD_PUT_HANDLER,
+            asyncClientStreamingCall(
+              new MethodHandlers<
+                com.service.grpc.CommunicationServiceOuterClass.Request,
+                com.service.grpc.CommunicationServiceOuterClass.Response>(
+                  this, METHODID_PUT_HANDLER)))
+          .addMethod(
+            METHOD_GET_HANDLER,
+            asyncServerStreamingCall(
+              new MethodHandlers<
+                com.service.grpc.CommunicationServiceOuterClass.Request,
+                com.service.grpc.CommunicationServiceOuterClass.Response>(
+                  this, METHODID_GET_HANDLER)))
+          .addMethod(
+            METHOD_PING,
             asyncUnaryCall(
               new MethodHandlers<
                 com.service.grpc.CommunicationServiceOuterClass.Request,
                 com.service.grpc.CommunicationServiceOuterClass.Response>(
-                  this, METHODID_MESSAGE_HANDLER)))
+                  this, METHODID_PING)))
           .build();
     }
   }
@@ -108,10 +162,26 @@ public final class CommunicationServiceGrpc {
 
     /**
      */
-    public void messageHandler(com.service.grpc.CommunicationServiceOuterClass.Request request,
+    public io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Request> putHandler(
+        io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response> responseObserver) {
+      return asyncClientStreamingCall(
+          getChannel().newCall(METHOD_PUT_HANDLER, getCallOptions()), responseObserver);
+    }
+
+    /**
+     */
+    public void getHandler(com.service.grpc.CommunicationServiceOuterClass.Request request,
+        io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response> responseObserver) {
+      asyncServerStreamingCall(
+          getChannel().newCall(METHOD_GET_HANDLER, getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void ping(com.service.grpc.CommunicationServiceOuterClass.Request request,
         io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response> responseObserver) {
       asyncUnaryCall(
-          getChannel().newCall(METHOD_MESSAGE_HANDLER, getCallOptions()), request, responseObserver);
+          getChannel().newCall(METHOD_PING, getCallOptions()), request, responseObserver);
     }
   }
 
@@ -135,9 +205,17 @@ public final class CommunicationServiceGrpc {
 
     /**
      */
-    public com.service.grpc.CommunicationServiceOuterClass.Response messageHandler(com.service.grpc.CommunicationServiceOuterClass.Request request) {
+    public java.util.Iterator<com.service.grpc.CommunicationServiceOuterClass.Response> getHandler(
+        com.service.grpc.CommunicationServiceOuterClass.Request request) {
+      return blockingServerStreamingCall(
+          getChannel(), METHOD_GET_HANDLER, getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.service.grpc.CommunicationServiceOuterClass.Response ping(com.service.grpc.CommunicationServiceOuterClass.Request request) {
       return blockingUnaryCall(
-          getChannel(), METHOD_MESSAGE_HANDLER, getCallOptions(), request);
+          getChannel(), METHOD_PING, getCallOptions(), request);
     }
   }
 
@@ -161,14 +239,16 @@ public final class CommunicationServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<com.service.grpc.CommunicationServiceOuterClass.Response> messageHandler(
+    public com.google.common.util.concurrent.ListenableFuture<com.service.grpc.CommunicationServiceOuterClass.Response> ping(
         com.service.grpc.CommunicationServiceOuterClass.Request request) {
       return futureUnaryCall(
-          getChannel().newCall(METHOD_MESSAGE_HANDLER, getCallOptions()), request);
+          getChannel().newCall(METHOD_PING, getCallOptions()), request);
     }
   }
 
-  private static final int METHODID_MESSAGE_HANDLER = 0;
+  private static final int METHODID_GET_HANDLER = 0;
+  private static final int METHODID_PING = 1;
+  private static final int METHODID_PUT_HANDLER = 2;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -187,8 +267,12 @@ public final class CommunicationServiceGrpc {
     @java.lang.SuppressWarnings("unchecked")
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
-        case METHODID_MESSAGE_HANDLER:
-          serviceImpl.messageHandler((com.service.grpc.CommunicationServiceOuterClass.Request) request,
+        case METHODID_GET_HANDLER:
+          serviceImpl.getHandler((com.service.grpc.CommunicationServiceOuterClass.Request) request,
+              (io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response>) responseObserver);
+          break;
+        case METHODID_PING:
+          serviceImpl.ping((com.service.grpc.CommunicationServiceOuterClass.Request) request,
               (io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response>) responseObserver);
           break;
         default:
@@ -201,6 +285,9 @@ public final class CommunicationServiceGrpc {
     public io.grpc.stub.StreamObserver<Req> invoke(
         io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
+        case METHODID_PUT_HANDLER:
+          return (io.grpc.stub.StreamObserver<Req>) serviceImpl.putHandler(
+              (io.grpc.stub.StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Response>) responseObserver);
         default:
           throw new AssertionError();
       }
@@ -252,7 +339,9 @@ public final class CommunicationServiceGrpc {
         if (result == null) {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new CommunicationServiceFileDescriptorSupplier())
-              .addMethod(METHOD_MESSAGE_HANDLER)
+              .addMethod(METHOD_PUT_HANDLER)
+              .addMethod(METHOD_GET_HANDLER)
+              .addMethod(METHOD_PING)
               .build();
         }
       }

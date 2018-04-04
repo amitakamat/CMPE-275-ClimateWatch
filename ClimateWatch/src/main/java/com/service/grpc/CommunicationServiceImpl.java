@@ -11,6 +11,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import com.mongodb.QueryBuilder;
 import com.mongodb.client.MongoCursor;
+import com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
 import java.util.Date;
@@ -36,29 +37,36 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		}
 	 }
 	
-	@Override
-     public void messageHandler(CommunicationServiceOuterClass.Request request,
+	public void ping(CommunicationServiceOuterClass.Request request,
+          StreamObserver<CommunicationServiceOuterClass.Response> responseObserver) {
+		System.out.println("Received a ping request");
+		String successMsg = "Ping Successfull";
+		
+		CommunicationServiceOuterClass.Response response = CommunicationServiceOuterClass.Response.newBuilder()
+  	          .setCode(UploadStatusCode.Ok)
+  	          .setMsg(successMsg)
+  	          .build();
+
+	     responseObserver.onNext(response);
+	     responseObserver.onCompleted();
+		
+	}
+	
+    public void putHandler(StreamObserver<com.service.grpc.CommunicationServiceOuterClass.Request> request,
            StreamObserver<CommunicationServiceOuterClass.Response> responseObserver) {
      // CommunicationRequest has toString auto-generated.
 
-       System.out.println("Received a header request");
-       String successMsg = "";
-       if(request.getPing().toString().length() != 0) {
-    	   successMsg = "Ping Successfull";
-    	  // System.out.println(request.getPing().toString().length());
-       }
-       else if(request.getPutRequest().toString().length() != 0) {
-    	   successMsg = "Put call Successfull";
+		   System.out.println("Received a PUT request");
+    	   String successMsg = "Put call Successfull";
     	   //System.out.println(request.getPutRequest().toString().length());
-       }
-       else {
+       /*else {
     	   successMsg = "Get call Successfull";
     	   CommunicationServiceOuterClass.QueryParams params = request.getGetRequest().getQueryParams();
     	   if (queryDB(params.getFromUtc(), params.getToUtc()))
     		   successMsg = "Data present";
     	   else
     		   successMsg = "Data not present";
-       }	   
+       }*/	   
        
        CommunicationServiceOuterClass.MetaData metadata =
     		      CommunicationServiceOuterClass.MetaData.newBuilder()
@@ -73,8 +81,6 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
  		      		  .build();
 
        CommunicationServiceOuterClass.Response response = CommunicationServiceOuterClass.Response.newBuilder()
-    	          .setIsSuccess(true)
-    	          .setMsg(successMsg)
     	          .setMetaData(metadata)
     	          .setDatFragment(dataFragment)
     	          .build();
@@ -82,6 +88,41 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
        responseObserver.onNext(response);
        responseObserver.onCompleted();
      }
+	
+    public void getHandler(CommunicationServiceOuterClass.Request request,
+          StreamObserver<CommunicationServiceOuterClass.Response> responseObserver) {
+    // CommunicationRequest has toString auto-generated.
+
+		   System.out.println("Get call Successfull");
+   	   String successMsg = "Get call Successfull";
+   	   //System.out.println(request.getPutRequest().toString().length());
+   	   CommunicationServiceOuterClass.QueryParams params = request.getGetRequest().getQueryParams();
+   	   if (queryDB(params.getFromUtc(), params.getToUtc()))
+   		   successMsg = "Data present";
+   	   else
+   		   successMsg = "Data not present";	   
+      
+      CommunicationServiceOuterClass.MetaData metadata =
+   		      CommunicationServiceOuterClass.MetaData.newBuilder()
+   		          .setUuid("12345")
+   		          .setNumOfFragment(1)
+   		          .setMediaType(3)
+   		          .build();
+      
+      CommunicationServiceOuterClass.DatFragment dataFragment =
+		      CommunicationServiceOuterClass.DatFragment.newBuilder()
+		      		  .setData(ByteString.copyFromUtf8("sample raw bytes"))
+		      		  .build();
+
+      CommunicationServiceOuterClass.Response response = CommunicationServiceOuterClass.Response.newBuilder()
+   	          .setMsg(successMsg)
+   	          .setMetaData(metadata)
+   	          .setDatFragment(dataFragment)
+   	          .build();
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    }
 	
 	/**
 	 * a message was received from the server. Here we extract the from and to date time,

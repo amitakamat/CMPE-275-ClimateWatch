@@ -14,6 +14,113 @@ public final class CommunicationServiceOuterClass {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  /**
+   * Protobuf enum {@code com.service.grpc.UploadStatusCode}
+   */
+  public enum UploadStatusCode
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>Unknown = 0;</code>
+     */
+    Unknown(0),
+    /**
+     * <code>Ok = 1;</code>
+     */
+    Ok(1),
+    /**
+     * <code>Failed = 2;</code>
+     */
+    Failed(2),
+    UNRECOGNIZED(-1),
+    ;
+
+    /**
+     * <code>Unknown = 0;</code>
+     */
+    public static final int Unknown_VALUE = 0;
+    /**
+     * <code>Ok = 1;</code>
+     */
+    public static final int Ok_VALUE = 1;
+    /**
+     * <code>Failed = 2;</code>
+     */
+    public static final int Failed_VALUE = 2;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static UploadStatusCode valueOf(int value) {
+      return forNumber(value);
+    }
+
+    public static UploadStatusCode forNumber(int value) {
+      switch (value) {
+        case 0: return Unknown;
+        case 1: return Ok;
+        case 2: return Failed;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<UploadStatusCode>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        UploadStatusCode> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<UploadStatusCode>() {
+            public UploadStatusCode findValueByNumber(int number) {
+              return UploadStatusCode.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return com.service.grpc.CommunicationServiceOuterClass.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final UploadStatusCode[] VALUES = values();
+
+    public static UploadStatusCode valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private UploadStatusCode(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:com.service.grpc.UploadStatusCode)
+  }
+
   public interface RequestOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.service.grpc.Request)
       com.google.protobuf.MessageOrBuilder {
@@ -1540,9 +1647,17 @@ public final class CommunicationServiceOuterClass {
      * PingRequest will only use this field if succeeded
      * </pre>
      *
-     * <code>bool isSuccess = 1;</code>
+     * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
      */
-    boolean getIsSuccess();
+    int getCodeValue();
+    /**
+     * <pre>
+     * PingRequest will only use this field if succeeded
+     * </pre>
+     *
+     * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
+     */
+    com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode getCode();
 
     /**
      * <code>string msg = 2;</code>
@@ -1593,7 +1708,7 @@ public final class CommunicationServiceOuterClass {
       super(builder);
     }
     private Response() {
-      isSuccess_ = false;
+      code_ = 0;
       msg_ = "";
     }
 
@@ -1626,8 +1741,9 @@ public final class CommunicationServiceOuterClass {
               break;
             }
             case 8: {
+              int rawValue = input.readEnum();
 
-              isSuccess_ = input.readBool();
+              code_ = rawValue;
               break;
             }
             case 18: {
@@ -1686,17 +1802,28 @@ public final class CommunicationServiceOuterClass {
               com.service.grpc.CommunicationServiceOuterClass.Response.class, com.service.grpc.CommunicationServiceOuterClass.Response.Builder.class);
     }
 
-    public static final int ISSUCCESS_FIELD_NUMBER = 1;
-    private boolean isSuccess_;
+    public static final int CODE_FIELD_NUMBER = 1;
+    private int code_;
     /**
      * <pre>
      * PingRequest will only use this field if succeeded
      * </pre>
      *
-     * <code>bool isSuccess = 1;</code>
+     * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
      */
-    public boolean getIsSuccess() {
-      return isSuccess_;
+    public int getCodeValue() {
+      return code_;
+    }
+    /**
+     * <pre>
+     * PingRequest will only use this field if succeeded
+     * </pre>
+     *
+     * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
+     */
+    public com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode getCode() {
+      com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode result = com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.valueOf(code_);
+      return result == null ? com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.UNRECOGNIZED : result;
     }
 
     public static final int MSG_FIELD_NUMBER = 2;
@@ -1787,8 +1914,8 @@ public final class CommunicationServiceOuterClass {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (isSuccess_ != false) {
-        output.writeBool(1, isSuccess_);
+      if (code_ != com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.Unknown.getNumber()) {
+        output.writeEnum(1, code_);
       }
       if (!getMsgBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, msg_);
@@ -1807,9 +1934,9 @@ public final class CommunicationServiceOuterClass {
       if (size != -1) return size;
 
       size = 0;
-      if (isSuccess_ != false) {
+      if (code_ != com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.Unknown.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(1, isSuccess_);
+          .computeEnumSize(1, code_);
       }
       if (!getMsgBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, msg_);
@@ -1838,8 +1965,7 @@ public final class CommunicationServiceOuterClass {
       com.service.grpc.CommunicationServiceOuterClass.Response other = (com.service.grpc.CommunicationServiceOuterClass.Response) obj;
 
       boolean result = true;
-      result = result && (getIsSuccess()
-          == other.getIsSuccess());
+      result = result && code_ == other.code_;
       result = result && getMsg()
           .equals(other.getMsg());
       result = result && (hasMetaData() == other.hasMetaData());
@@ -1863,9 +1989,8 @@ public final class CommunicationServiceOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ISSUCCESS_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getIsSuccess());
+      hash = (37 * hash) + CODE_FIELD_NUMBER;
+      hash = (53 * hash) + code_;
       hash = (37 * hash) + MSG_FIELD_NUMBER;
       hash = (53 * hash) + getMsg().hashCode();
       if (hasMetaData()) {
@@ -2005,7 +2130,7 @@ public final class CommunicationServiceOuterClass {
       }
       public Builder clear() {
         super.clear();
-        isSuccess_ = false;
+        code_ = 0;
 
         msg_ = "";
 
@@ -2043,7 +2168,7 @@ public final class CommunicationServiceOuterClass {
 
       public com.service.grpc.CommunicationServiceOuterClass.Response buildPartial() {
         com.service.grpc.CommunicationServiceOuterClass.Response result = new com.service.grpc.CommunicationServiceOuterClass.Response(this);
-        result.isSuccess_ = isSuccess_;
+        result.code_ = code_;
         result.msg_ = msg_;
         if (metaDataBuilder_ == null) {
           result.metaData_ = metaData_;
@@ -2096,8 +2221,8 @@ public final class CommunicationServiceOuterClass {
 
       public Builder mergeFrom(com.service.grpc.CommunicationServiceOuterClass.Response other) {
         if (other == com.service.grpc.CommunicationServiceOuterClass.Response.getDefaultInstance()) return this;
-        if (other.getIsSuccess() != false) {
-          setIsSuccess(other.getIsSuccess());
+        if (other.code_ != 0) {
+          setCodeValue(other.getCodeValue());
         }
         if (!other.getMsg().isEmpty()) {
           msg_ = other.msg_;
@@ -2136,27 +2261,26 @@ public final class CommunicationServiceOuterClass {
         return this;
       }
 
-      private boolean isSuccess_ ;
+      private int code_ = 0;
       /**
        * <pre>
        * PingRequest will only use this field if succeeded
        * </pre>
        *
-       * <code>bool isSuccess = 1;</code>
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
        */
-      public boolean getIsSuccess() {
-        return isSuccess_;
+      public int getCodeValue() {
+        return code_;
       }
       /**
        * <pre>
        * PingRequest will only use this field if succeeded
        * </pre>
        *
-       * <code>bool isSuccess = 1;</code>
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
        */
-      public Builder setIsSuccess(boolean value) {
-        
-        isSuccess_ = value;
+      public Builder setCodeValue(int value) {
+        code_ = value;
         onChanged();
         return this;
       }
@@ -2165,11 +2289,38 @@ public final class CommunicationServiceOuterClass {
        * PingRequest will only use this field if succeeded
        * </pre>
        *
-       * <code>bool isSuccess = 1;</code>
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
        */
-      public Builder clearIsSuccess() {
+      public com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode getCode() {
+        com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode result = com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.valueOf(code_);
+        return result == null ? com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * PingRequest will only use this field if succeeded
+       * </pre>
+       *
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
+       */
+      public Builder setCode(com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
         
-        isSuccess_ = false;
+        code_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * PingRequest will only use this field if succeeded
+       * </pre>
+       *
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
+       */
+      public Builder clearCode() {
+        
+        code_ = 0;
         onChanged();
         return this;
       }
@@ -5941,7 +6092,17 @@ public final class CommunicationServiceOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>bytes data = 1;</code>
+     * <code>string timestamp_utc = 1;</code>
+     */
+    java.lang.String getTimestampUtc();
+    /**
+     * <code>string timestamp_utc = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getTimestampUtcBytes();
+
+    /**
+     * <code>bytes data = 2;</code>
      */
     com.google.protobuf.ByteString getData();
   }
@@ -5958,6 +6119,7 @@ public final class CommunicationServiceOuterClass {
       super(builder);
     }
     private DatFragment() {
+      timestampUtc_ = "";
       data_ = com.google.protobuf.ByteString.EMPTY;
     }
 
@@ -5990,6 +6152,12 @@ public final class CommunicationServiceOuterClass {
               break;
             }
             case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              timestampUtc_ = s;
+              break;
+            }
+            case 18: {
 
               data_ = input.readBytes();
               break;
@@ -6018,10 +6186,44 @@ public final class CommunicationServiceOuterClass {
               com.service.grpc.CommunicationServiceOuterClass.DatFragment.class, com.service.grpc.CommunicationServiceOuterClass.DatFragment.Builder.class);
     }
 
-    public static final int DATA_FIELD_NUMBER = 1;
+    public static final int TIMESTAMP_UTC_FIELD_NUMBER = 1;
+    private volatile java.lang.Object timestampUtc_;
+    /**
+     * <code>string timestamp_utc = 1;</code>
+     */
+    public java.lang.String getTimestampUtc() {
+      java.lang.Object ref = timestampUtc_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        timestampUtc_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string timestamp_utc = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTimestampUtcBytes() {
+      java.lang.Object ref = timestampUtc_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        timestampUtc_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DATA_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString data_;
     /**
-     * <code>bytes data = 1;</code>
+     * <code>bytes data = 2;</code>
      */
     public com.google.protobuf.ByteString getData() {
       return data_;
@@ -6039,8 +6241,11 @@ public final class CommunicationServiceOuterClass {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (!getTimestampUtcBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, timestampUtc_);
+      }
       if (!data_.isEmpty()) {
-        output.writeBytes(1, data_);
+        output.writeBytes(2, data_);
       }
       unknownFields.writeTo(output);
     }
@@ -6050,9 +6255,12 @@ public final class CommunicationServiceOuterClass {
       if (size != -1) return size;
 
       size = 0;
+      if (!getTimestampUtcBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, timestampUtc_);
+      }
       if (!data_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, data_);
+          .computeBytesSize(2, data_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6070,6 +6278,8 @@ public final class CommunicationServiceOuterClass {
       com.service.grpc.CommunicationServiceOuterClass.DatFragment other = (com.service.grpc.CommunicationServiceOuterClass.DatFragment) obj;
 
       boolean result = true;
+      result = result && getTimestampUtc()
+          .equals(other.getTimestampUtc());
       result = result && getData()
           .equals(other.getData());
       result = result && unknownFields.equals(other.unknownFields);
@@ -6083,6 +6293,8 @@ public final class CommunicationServiceOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + TIMESTAMP_UTC_FIELD_NUMBER;
+      hash = (53 * hash) + getTimestampUtc().hashCode();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -6214,6 +6426,8 @@ public final class CommunicationServiceOuterClass {
       }
       public Builder clear() {
         super.clear();
+        timestampUtc_ = "";
+
         data_ = com.google.protobuf.ByteString.EMPTY;
 
         return this;
@@ -6238,6 +6452,7 @@ public final class CommunicationServiceOuterClass {
 
       public com.service.grpc.CommunicationServiceOuterClass.DatFragment buildPartial() {
         com.service.grpc.CommunicationServiceOuterClass.DatFragment result = new com.service.grpc.CommunicationServiceOuterClass.DatFragment(this);
+        result.timestampUtc_ = timestampUtc_;
         result.data_ = data_;
         onBuilt();
         return result;
@@ -6280,6 +6495,10 @@ public final class CommunicationServiceOuterClass {
 
       public Builder mergeFrom(com.service.grpc.CommunicationServiceOuterClass.DatFragment other) {
         if (other == com.service.grpc.CommunicationServiceOuterClass.DatFragment.getDefaultInstance()) return this;
+        if (!other.getTimestampUtc().isEmpty()) {
+          timestampUtc_ = other.timestampUtc_;
+          onChanged();
+        }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
         }
@@ -6310,15 +6529,84 @@ public final class CommunicationServiceOuterClass {
         return this;
       }
 
+      private java.lang.Object timestampUtc_ = "";
+      /**
+       * <code>string timestamp_utc = 1;</code>
+       */
+      public java.lang.String getTimestampUtc() {
+        java.lang.Object ref = timestampUtc_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          timestampUtc_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string timestamp_utc = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTimestampUtcBytes() {
+        java.lang.Object ref = timestampUtc_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          timestampUtc_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string timestamp_utc = 1;</code>
+       */
+      public Builder setTimestampUtc(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        timestampUtc_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string timestamp_utc = 1;</code>
+       */
+      public Builder clearTimestampUtc() {
+        
+        timestampUtc_ = getDefaultInstance().getTimestampUtc();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string timestamp_utc = 1;</code>
+       */
+      public Builder setTimestampUtcBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        timestampUtc_ = value;
+        onChanged();
+        return this;
+      }
+
       private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>bytes data = 1;</code>
+       * <code>bytes data = 2;</code>
        */
       public com.google.protobuf.ByteString getData() {
         return data_;
       }
       /**
-       * <code>bytes data = 1;</code>
+       * <code>bytes data = 2;</code>
        */
       public Builder setData(com.google.protobuf.ByteString value) {
         if (value == null) {
@@ -6330,7 +6618,7 @@ public final class CommunicationServiceOuterClass {
         return this;
       }
       /**
-       * <code>bytes data = 1;</code>
+       * <code>bytes data = 2;</code>
        */
       public Builder clearData() {
         
@@ -6443,21 +6731,27 @@ public final class CommunicationServiceOuterClass {
       "RequestH\000\0222\n\nputRequest\030\007 \001(\0132\034.com.serv" +
       "ice.grpc.PutRequestH\000\0222\n\ngetRequest\030\010 \001(" +
       "\0132\034.com.service.grpc.GetRequestH\000B\t\n\007pay" +
-      "load\"\214\001\n\010Response\022\021\n\tisSuccess\030\001 \001(\010\022\013\n\003" +
-      "msg\030\002 \001(\t\022,\n\010metaData\030\003 \001(\0132\032.com.servic" +
-      "e.grpc.MetaData\0222\n\013datFragment\030\004 \001(\0132\035.c",
-      "om.service.grpc.DatFragment\"\032\n\013PingReque" +
-      "st\022\013\n\003msg\030\001 \001(\t\"n\n\nPutRequest\022,\n\010metaDat" +
-      "a\030\001 \001(\0132\032.com.service.grpc.MetaData\0222\n\013d" +
-      "atFragment\030\002 \001(\0132\035.com.service.grpc.DatF" +
-      "ragment\"n\n\nGetRequest\022,\n\010metaData\030\001 \001(\0132" +
-      "\032.com.service.grpc.MetaData\0222\n\013queryPara" +
-      "ms\030\002 \001(\0132\035.com.service.grpc.QueryParams\"" +
-      "/\n\013QueryParams\022\020\n\010from_utc\030\001 \001(\t\022\016\n\006to_u" +
-      "tc\030\002 \001(\t\"B\n\010MetaData\022\014\n\004uuid\030\001 \001(\t\022\025\n\rnu" +
-      "mOfFragment\030\002 \001(\005\022\021\n\tmediaType\030\003 \001(\005\"\033\n\013",
-      "DatFragment\022\014\n\004data\030\001 \001(\0142_\n\024Communicati" +
-      "onService\022G\n\016MessageHandler\022\031.com.servic" +
+      "load\"\253\001\n\010Response\0220\n\004Code\030\001 \001(\0162\".com.se" +
+      "rvice.grpc.UploadStatusCode\022\013\n\003msg\030\002 \001(\t" +
+      "\022,\n\010metaData\030\003 \001(\0132\032.com.service.grpc.Me",
+      "taData\0222\n\013datFragment\030\004 \001(\0132\035.com.servic" +
+      "e.grpc.DatFragment\"\032\n\013PingRequest\022\013\n\003msg" +
+      "\030\001 \001(\t\"n\n\nPutRequest\022,\n\010metaData\030\001 \001(\0132\032" +
+      ".com.service.grpc.MetaData\0222\n\013datFragmen" +
+      "t\030\002 \001(\0132\035.com.service.grpc.DatFragment\"n" +
+      "\n\nGetRequest\022,\n\010metaData\030\001 \001(\0132\032.com.ser" +
+      "vice.grpc.MetaData\0222\n\013queryParams\030\002 \001(\0132" +
+      "\035.com.service.grpc.QueryParams\"/\n\013QueryP" +
+      "arams\022\020\n\010from_utc\030\001 \001(\t\022\016\n\006to_utc\030\002 \001(\t\"" +
+      "B\n\010MetaData\022\014\n\004uuid\030\001 \001(\t\022\025\n\rnumOfFragme",
+      "nt\030\002 \001(\005\022\021\n\tmediaType\030\003 \001(\005\"2\n\013DatFragme" +
+      "nt\022\025\n\rtimestamp_utc\030\001 \001(\t\022\014\n\004data\030\002 \001(\014*" +
+      "3\n\020UploadStatusCode\022\013\n\007Unknown\020\000\022\006\n\002Ok\020\001" +
+      "\022\n\n\006Failed\020\0022\343\001\n\024CommunicationService\022E\n" +
+      "\nPutHandler\022\031.com.service.grpc.Request\032\032" +
+      ".com.service.grpc.Response(\001\022E\n\nGetHandl" +
+      "er\022\031.com.service.grpc.Request\032\032.com.serv" +
+      "ice.grpc.Response0\001\022=\n\004Ping\022\031.com.servic" +
       "e.grpc.Request\032\032.com.service.grpc.Respon" +
       "seB\002H\001b\006proto3"
     };
@@ -6484,7 +6778,7 @@ public final class CommunicationServiceOuterClass {
     internal_static_com_service_grpc_Response_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_service_grpc_Response_descriptor,
-        new java.lang.String[] { "IsSuccess", "Msg", "MetaData", "DatFragment", });
+        new java.lang.String[] { "Code", "Msg", "MetaData", "DatFragment", });
     internal_static_com_service_grpc_PingRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_com_service_grpc_PingRequest_fieldAccessorTable = new
@@ -6520,7 +6814,7 @@ public final class CommunicationServiceOuterClass {
     internal_static_com_service_grpc_DatFragment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_service_grpc_DatFragment_descriptor,
-        new java.lang.String[] { "Data", });
+        new java.lang.String[] { "TimestampUtc", "Data", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

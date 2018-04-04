@@ -3,6 +3,7 @@ package com.service.grpc;
 import com.google.protobuf.ByteString;
 
 import io.grpc.*;
+import io.grpc.stub.StreamObserver;
 
 public class Client
 {
@@ -25,10 +26,10 @@ public class Client
           .setPing(pingRequest)
           .build();
 
-      CommunicationServiceOuterClass.Response response = stub.messageHandler(request);
+      CommunicationServiceOuterClass.Response response = stub.ping(request);
       System.out.println(response);
       
-      CommunicationServiceOuterClass.MetaData metadata =
+      /*CommunicationServiceOuterClass.MetaData metadata =
 		      CommunicationServiceOuterClass.MetaData.newBuilder()
 		          .setUuid("12345")
 		          .setNumOfFragment(1)
@@ -51,7 +52,7 @@ public class Client
 		          .setToReceiver("to Receiver")
 		          .setPutRequest(putRequest)
 		          .build();
-   	  response = stub.messageHandler(request);
+   	  response = stub.putHandler(request);
 
       System.out.println(response);
       
@@ -75,9 +76,9 @@ public class Client
 	          .setGetRequest(getRequest)
 	          .build();
       
-      response = stub.messageHandler(request);
+      response = stub.getHandler(request);
 
-      System.out.println(response);
+      System.out.println(response);*/
 
       channel.shutdownNow();
     }

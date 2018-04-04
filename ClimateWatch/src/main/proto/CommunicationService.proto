@@ -13,11 +13,10 @@ message Request {
     PutRequest putRequest = 7;
     GetRequest getRequest = 8;
   }
-
 }
 
 message Response {
-  bool isSuccess = 1; // PingRequest will only use this field if succeeded
+  UploadStatusCode Code = 1; // PingRequest will only use this field if succeeded
   string msg = 2;
   MetaData metaData = 3;
   DatFragment datFragment = 4;
@@ -49,9 +48,18 @@ message MetaData {
 }
 
 message DatFragment {
-  bytes data = 1;
+  string timestamp_utc = 1;
+  bytes data = 2;
+}
+
+enum UploadStatusCode {
+  Unknown = 0;
+  Ok = 1;
+  Failed = 2;
 }
 
 service CommunicationService {
-  rpc MessageHandler(Request) returns (Response);
+  rpc PutHandler(stream Request) returns (Response);
+  rpc GetHandler(Request) returns (stream Response);
+  rpc Ping(Request) returns (Response);
 }
