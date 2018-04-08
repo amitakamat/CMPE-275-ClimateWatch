@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package com.service.grpc;
 
 option optimize_for = SPEED;

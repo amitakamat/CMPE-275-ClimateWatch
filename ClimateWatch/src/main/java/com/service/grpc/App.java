@@ -16,10 +16,10 @@ public class App
 	    int port = 8000;
 	    //server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
 	    
-	    server = ServerBuilder.forPort(port)
-	        	.addService(new CommunicationServiceImpl())
-	        	.build().start();
-	    
+//	    server = ServerBuilder.forPort(port)
+//	        	.addService(new CommunicationServiceImpl())
+//	        	.build().start();
+//	    
 	    logger.info("Server started, listening on " + port);
 	    
 	    Runtime.getRuntime().addShutdownHook(new Thread() {

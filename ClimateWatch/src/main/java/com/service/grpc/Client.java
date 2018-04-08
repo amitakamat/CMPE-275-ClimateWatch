@@ -13,22 +13,23 @@ public class Client
         .usePlaintext(true)
         .build();
       
-      CommunicationServiceOuterClass.PingRequest pingRequest =
-      CommunicationServiceOuterClass.PingRequest.newBuilder()
-          .setMsg("Sample Ping Request")
-          .build();
-
-      CommunicationServiceGrpc.CommunicationServiceBlockingStub stub = CommunicationServiceGrpc.newBlockingStub(channel);
-      CommunicationServiceOuterClass.Request request =
-      CommunicationServiceOuterClass.Request.newBuilder()
-          .setFromSender("from sender")
-          .setToReceiver("to Receiver")
-          .setPing(pingRequest)
-          .build();
-
-      CommunicationServiceOuterClass.Response response = stub.ping(request);
-      System.out.println(response);
       
+//      CommunicationServiceOuterClass.PingRequest pingRequest =
+//      CommunicationServiceOuterClass.PingRequest.newBuilder()
+//          .setMsg("Sample Ping Request")
+//          .build();
+//
+//      CommunicationServiceGrpc.CommunicationServiceBlockingStub stub = CommunicationServiceGrpc.newBlockingStub(channel);
+//      CommunicationServiceOuterClass.Request request =
+//      CommunicationServiceOuterClass.Request.newBuilder()
+//          .setFromSender("from sender")
+//          .setToReceiver("to Receiver")
+//          .setPing(pingRequest)
+//          .build();
+//
+//      CommunicationServiceOuterClass.Response response = stub.ping(request);
+//      System.out.println(response);
+//      
       /*CommunicationServiceOuterClass.MetaData metadata =
 		      CommunicationServiceOuterClass.MetaData.newBuilder()
 		          .setUuid("12345")

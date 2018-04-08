@@ -30,7 +30,10 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 				mongoClient = new MongoClient("localhost", 27017);
 				DB messageDB = mongoClient.getDB("messagesDB");
 				dbCollection = messageDB.getCollection("messages");
+			
 			}
+			
+			
 			catch(Exception e) {
 				System.out.println(e.getMessage());
 			}
@@ -42,10 +45,12 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		System.out.println("Received a ping request");
 		String successMsg = "Ping Successfull";
 		
+		
 		CommunicationServiceOuterClass.Response response = CommunicationServiceOuterClass.Response.newBuilder()
   	          .setCode(UploadStatusCode.Ok)
   	          .setMsg(successMsg)
   	          .build();
+		
 
 	     responseObserver.onNext(response);
 	     responseObserver.onCompleted();
