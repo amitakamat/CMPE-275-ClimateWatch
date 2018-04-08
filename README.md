@@ -1,5 +1,19 @@
 # CMPE-275-ClimateWatch
-  
+
+Tips:
+1) To regenerate .proto files, make a small edit and save, eclipse IDE will regenerate .java files from .proto files.
+2) protoc-dependencies error will show as we don`t have env for go , C#, etc, but it will affect our compile, build, intellisense.
+3) If you are using Eclipse, you need to install an additional Eclipse plugin because m2e does not evaluate the extension specified in a pom.xml. Download os-maven-plugin-1.5.0.Final.jar from http://repo1.maven.org/maven2/kr/motd/maven/os-maven-plugin/1.5.0.Final/os-maven-plugin-1.5.0.Final.jar and put it into the <ECLIPSE_HOME>/plugins directory.
+
+4)finally to run any file , having an entry point , ie "main" , right click on file in eclipse, run As -> java application /jUnit test.
+
+To run Server code : mvn exec:java -Dexec.mainClass=com.service.grpc.App    
+To run Client code : mvn exec:java -Dexec.mainClass=com.service.grpc.Client  
+NOTE: you don`t need mvn package exec, it just cleans and recompiles everything. mvn exec should do the trick
+
+
+
+
   
 Navigate to ClimateWatch folder.  
   
