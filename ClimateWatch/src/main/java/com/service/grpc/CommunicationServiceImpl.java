@@ -11,7 +11,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import com.mongodb.QueryBuilder;
 import com.mongodb.client.MongoCursor;
-import com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode;
+import com.service.grpc.CommunicationServiceOuterClass.StatusCode;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
 import java.util.Date;
@@ -29,7 +29,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 				//mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
 				mongoClient = new MongoClient("localhost", 27017);
 				DB messageDB = mongoClient.getDB("messagesDB");
-				dbCollection = messageDB.getCollection("messages");
+				dbCollection = messageDB.getCollection("data");
 			
 			}
 			
@@ -47,7 +47,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		
 		
 		CommunicationServiceOuterClass.Response response = CommunicationServiceOuterClass.Response.newBuilder()
-  	          .setCode(UploadStatusCode.Ok)
+  	          .setCode(StatusCode.Ok)
   	          .setMsg(successMsg)
   	          .build();
 		
@@ -128,7 +128,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
       responseObserver.onNext(response);
       responseObserver.onCompleted();
     }
-	
+    
 	/**
 	 * a message was received from the server. Here we extract the from and to date time,
 	 * query the database to fetch records based on the query and display it.
@@ -142,7 +142,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		Date fromTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(from);
 		Date toTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(to);
 		
-		BasicDBObject query = new BasicDBObject("time", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
+		BasicDBObject query = new BasicDBObject("WeatherDate", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
 		DBCursor cursor = dbCollection.find(query);
 		while(cursor.hasNext()) {
 			found = true;
