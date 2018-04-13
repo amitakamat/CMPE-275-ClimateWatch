@@ -25,6 +25,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.leaderelection.raft.Raft.RaftNode;
+import gash.messaging.Node;
 import gash.router.container.RoutingConf;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -43,16 +45,19 @@ public class MessageServer {
 
 	protected RoutingConf conf;
 	protected boolean background = false;
+	
+	public Node n;
 
-	public MessageServer(RoutingConf conf) {
+	public MessageServer(RoutingConf conf, RaftNode n) {
 		this.conf = conf;
+		this.n=n;
 	}
 
 	public void release() {
 	}
 
 	public void startServer() {
-		StartCommunication comm = new StartCommunication(conf);
+		StartCommunication comm = new StartCommunication(conf,n);
 		logger.info("Communication starting");
 
 		if (background) {
@@ -76,7 +81,8 @@ public class MessageServer {
 	 * 
 	 * @param cfg
 	 */
-	public MessageServer(File cfg) {
+	public MessageServer(File cfg,Node n) {
+		this.n=n;
 		init(cfg);
 	}
 
@@ -117,9 +123,12 @@ public class MessageServer {
 	 */
 	private static class StartCommunication implements Runnable {
 		RoutingConf conf;
+		
+		public Node n;
 
-		public StartCommunication(RoutingConf conf) {
+		public StartCommunication(RoutingConf conf,Node n) {
 			this.conf = conf;
+			this.n=n;
 		}
 
 		public void run() {
@@ -140,7 +149,7 @@ public class MessageServer {
 				// b.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR);
 
 				boolean compressComm = false;
-				b.childHandler(new ServerInit(conf, compressComm));
+				b.childHandler(new ServerInit(conf, compressComm,n));
 
 				// Start the server.
 				logger.info("Starting server, listening on port = " + conf.getPort());

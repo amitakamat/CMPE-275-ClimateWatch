@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.CharsetUtil;
 import routing.Pipe.Route;
 
 /**
@@ -40,6 +41,7 @@ public class CommHandler extends SimpleChannelInboundHandler<Route> {
 	//private volatile Channel channel;
 
 	public CommHandler() {
+		System.out.println("CommHandler has been instantiated");
 	}
 
 	/**
@@ -72,6 +74,8 @@ public class CommHandler extends SimpleChannelInboundHandler<Route> {
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, Route msg) throws Exception {
 		System.out.println("--> got incoming message");
+		System.out.println(
+                "Client received: " + msg);
 		for (String id : listeners.keySet()) {
 			CommListener cl = listeners.get(id);
 

@@ -16,16 +16,38 @@
 package gash.router.server;
 
 import java.beans.Beans;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+
+import gash.leaderelection.raft.Raft.RaftNode;
+import gash.leaderelection.raft.Raft;
+import gash.leaderelection.raft.RaftMessage;
+import gash.messaging.Message;
+import gash.messaging.Node;
+import gash.messaging.Message.Delivery;
 import gash.router.container.RoutingConf;
 import gash.router.server.resources.RouteResource;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.CharsetUtil;
 import routing.Pipe.Route;
 
 /**
@@ -36,14 +58,35 @@ import routing.Pipe.Route;
  * @author gash
  * 
  */
-public class ServerHandler extends SimpleChannelInboundHandler<Route> {
+public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ ChannelInboundHandlerAdapter {
 	protected static Logger logger = LoggerFactory.getLogger("connect");
+	protected static MongoClient mongoClient;
+	protected static DBCollection dbCollection;
 
 	private HashMap<String, String> routing;
+	
+	public Node n;
 
-	public ServerHandler(RoutingConf conf) {
-		if (conf != null)
+	public ServerHandler(RoutingConf conf,Node n) {
+		
+		if (conf != null){
 			routing = conf.asHashMap();
+			this.n=n;
+		}
+		
+		if (mongoClient == null) {
+			try {
+				//mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+				mongoClient = new MongoClient("localhost", 27017);
+				DB messageDB = mongoClient.getDB("messagesDB");
+				dbCollection = messageDB.getCollection("messages");
+			}
+			catch(Exception e) {
+				System.out.println(e.getMessage());
+			}
+			System.out.println("N val"+n);
+			this.n=n;
+}
 	}
 
 	/**
@@ -73,6 +116,16 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 						Route.Builder rb = Route.newBuilder(msg);
 						rb.setPayload(reply);
 						channel.write(rb.build());
+
+						// Uncomment to query the database.
+						queryDB(msg.getPayload());
+						
+						
+						// Code to insert data in mongoDB
+						/*String uniqueID = UUID.randomUUID().toString();					
+						DBObject messageObject = new BasicDBObject("_id", uniqueID).append("messageID", msg.getId()).append("payload", msg.getPayload());
+						System.out.println(msg.getAllFields().toString());
+						dbCollection.insert(messageObject);*/
 					}
 				} catch (Exception e) {
 					// TODO add logging
@@ -93,6 +146,32 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 	}
 
 	/**
+	 * a message was received from the server. Here we extract the from and to date time,
+	 * query the database to fetch records based on the query and display it.
+	 * 
+	 * @param payload
+	 *            The message payload received
+	 */
+	public void queryDB(String payload) {
+		// Assuming we get from and to date in a single message divided by ',' 
+		String[] filters = payload.split(",");
+		try {
+		Date fromTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(filters[0]);
+		Date toTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(filters[1]);
+		
+		BasicDBObject query = new BasicDBObject("time", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
+		DBCursor cursor = dbCollection.find(query);
+		while(cursor.hasNext()) {
+	        System.out.println(cursor.next());
+	    }
+		
+		}
+		catch(Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+	
+	/**
 	 * a message was received from the server. Here we dispatch the message to
 	 * the client's thread pool to minimize the time it takes to process other
 	 * messages.
@@ -102,7 +181,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 	 * @param msg
 	 *            The message
 	 */
-	@Override
+	/*@Override
 	protected void channelRead0(ChannelHandlerContext ctx, Route msg) throws Exception {
 		System.out.println("------------");
 		handleMessage(msg, ctx.channel());
@@ -112,6 +191,52 @@ public class ServerHandler extends SimpleChannelInboundHandler<Route> {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		logger.error("Unexpected exception from downstream.", cause);
 		ctx.close();
-	}
+	}*/
+	
+	public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        //ByteBuf in = (ByteBuf) msg;
+        System.out.println(
+            "Server received: " + msg.toString());//in.toString(CharsetUtil.UTF_8));
+       // ctx.writeAndFlush(Unpooled.copiedBuffer("Netty MAY JUNE rock!", CharsetUtil.UTF_8));
+        
+        
+        Route.Builder rb = Route.newBuilder();
+		rb.setId(10);
+		rb.setPath("/message");
+		
+		RaftMessage msgR = new RaftMessage(Raft.msgID.incrementAndGet());
+        //msgR.setOriginator(getNodeId());
+        msgR.setDeliverAs(Delivery.Direct);
+        //msgR.setDestination(voteRequestMsg.getOriginator());
+        //msgR.setTerm(currentTerm);
+        if(msg.toString().equals("RequestVote"))
+        	msgR.setAction(RaftMessage.Action.RequestVote);
+        else
+        	msgR.setAction(RaftMessage.Action.Vote);
+		
+        this.n.message(msgR);
+		
+		//if(msg.toString().contains("vote request")){
+			//rb.setPayload("I vote for you");
+			//this.n.message((Message)msg);
+		//}
+		//else
+			//rb.setPayload("I dont vote for you");
+        ctx.channel().writeAndFlush(rb.build());
+    }
+
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+    	Route.Builder rb = Route.newBuilder();
+		rb.setId(10);
+		rb.setPath("/message");
+		rb.setPayload("Yo Yo Yo");
+       /// ctx.writeAndFlush(rb.build())
+          ///  .addListener(ChannelFutureListener.CLOSE);
+    }
+
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
+    }
 
 }
