@@ -1,5 +1,4 @@
 
-
 option optimize_for = SPEED;
 option java_package = "routing";
 

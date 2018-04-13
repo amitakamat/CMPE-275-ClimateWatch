@@ -15,9 +15,9 @@ public final class CommunicationServiceOuterClass {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   /**
-   * Protobuf enum {@code com.service.grpc.StatusCode}
+   * Protobuf enum {@code com.service.grpc.UploadStatusCode}
    */
-  public enum StatusCode
+  public enum UploadStatusCode
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
      * <code>Unknown = 0;</code>
@@ -60,11 +60,11 @@ public final class CommunicationServiceOuterClass {
      * @deprecated Use {@link #forNumber(int)} instead.
      */
     @java.lang.Deprecated
-    public static StatusCode valueOf(int value) {
+    public static UploadStatusCode valueOf(int value) {
       return forNumber(value);
     }
 
-    public static StatusCode forNumber(int value) {
+    public static UploadStatusCode forNumber(int value) {
       switch (value) {
         case 0: return Unknown;
         case 1: return Ok;
@@ -73,15 +73,15 @@ public final class CommunicationServiceOuterClass {
       }
     }
 
-    public static com.google.protobuf.Internal.EnumLiteMap<StatusCode>
+    public static com.google.protobuf.Internal.EnumLiteMap<UploadStatusCode>
         internalGetValueMap() {
       return internalValueMap;
     }
     private static final com.google.protobuf.Internal.EnumLiteMap<
-        StatusCode> internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<StatusCode>() {
-            public StatusCode findValueByNumber(int number) {
-              return StatusCode.forNumber(number);
+        UploadStatusCode> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<UploadStatusCode>() {
+            public UploadStatusCode findValueByNumber(int number) {
+              return UploadStatusCode.forNumber(number);
             }
           };
 
@@ -98,9 +98,9 @@ public final class CommunicationServiceOuterClass {
       return com.service.grpc.CommunicationServiceOuterClass.getDescriptor().getEnumTypes().get(0);
     }
 
-    private static final StatusCode[] VALUES = values();
+    private static final UploadStatusCode[] VALUES = values();
 
-    public static StatusCode valueOf(
+    public static UploadStatusCode valueOf(
         com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
       if (desc.getType() != getDescriptor()) {
         throw new java.lang.IllegalArgumentException(
@@ -114,11 +114,11 @@ public final class CommunicationServiceOuterClass {
 
     private final int value;
 
-    private StatusCode(int value) {
+    private UploadStatusCode(int value) {
       this.value = value;
     }
 
-    // @@protoc_insertion_point(enum_scope:com.service.grpc.StatusCode)
+    // @@protoc_insertion_point(enum_scope:com.service.grpc.UploadStatusCode)
   }
 
   public interface RequestOrBuilder extends
@@ -1647,7 +1647,7 @@ public final class CommunicationServiceOuterClass {
      * PingRequest will only use this field if succeeded
      * </pre>
      *
-     * <code>.com.service.grpc.StatusCode Code = 1;</code>
+     * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
      */
     int getCodeValue();
     /**
@@ -1655,9 +1655,9 @@ public final class CommunicationServiceOuterClass {
      * PingRequest will only use this field if succeeded
      * </pre>
      *
-     * <code>.com.service.grpc.StatusCode Code = 1;</code>
+     * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
      */
-    com.service.grpc.CommunicationServiceOuterClass.StatusCode getCode();
+    com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode getCode();
 
     /**
      * <code>string msg = 2;</code>
@@ -1809,7 +1809,7 @@ public final class CommunicationServiceOuterClass {
      * PingRequest will only use this field if succeeded
      * </pre>
      *
-     * <code>.com.service.grpc.StatusCode Code = 1;</code>
+     * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
      */
     public int getCodeValue() {
       return code_;
@@ -1819,11 +1819,11 @@ public final class CommunicationServiceOuterClass {
      * PingRequest will only use this field if succeeded
      * </pre>
      *
-     * <code>.com.service.grpc.StatusCode Code = 1;</code>
+     * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
      */
-    public com.service.grpc.CommunicationServiceOuterClass.StatusCode getCode() {
-      com.service.grpc.CommunicationServiceOuterClass.StatusCode result = com.service.grpc.CommunicationServiceOuterClass.StatusCode.valueOf(code_);
-      return result == null ? com.service.grpc.CommunicationServiceOuterClass.StatusCode.UNRECOGNIZED : result;
+    public com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode getCode() {
+      com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode result = com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.valueOf(code_);
+      return result == null ? com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.UNRECOGNIZED : result;
     }
 
     public static final int MSG_FIELD_NUMBER = 2;
@@ -1914,7 +1914,7 @@ public final class CommunicationServiceOuterClass {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (code_ != com.service.grpc.CommunicationServiceOuterClass.StatusCode.Unknown.getNumber()) {
+      if (code_ != com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.Unknown.getNumber()) {
         output.writeEnum(1, code_);
       }
       if (!getMsgBytes().isEmpty()) {
@@ -1934,7 +1934,7 @@ public final class CommunicationServiceOuterClass {
       if (size != -1) return size;
 
       size = 0;
-      if (code_ != com.service.grpc.CommunicationServiceOuterClass.StatusCode.Unknown.getNumber()) {
+      if (code_ != com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.Unknown.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, code_);
       }
@@ -2267,7 +2267,7 @@ public final class CommunicationServiceOuterClass {
        * PingRequest will only use this field if succeeded
        * </pre>
        *
-       * <code>.com.service.grpc.StatusCode Code = 1;</code>
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
        */
       public int getCodeValue() {
         return code_;
@@ -2277,7 +2277,7 @@ public final class CommunicationServiceOuterClass {
        * PingRequest will only use this field if succeeded
        * </pre>
        *
-       * <code>.com.service.grpc.StatusCode Code = 1;</code>
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
        */
       public Builder setCodeValue(int value) {
         code_ = value;
@@ -2289,20 +2289,20 @@ public final class CommunicationServiceOuterClass {
        * PingRequest will only use this field if succeeded
        * </pre>
        *
-       * <code>.com.service.grpc.StatusCode Code = 1;</code>
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
        */
-      public com.service.grpc.CommunicationServiceOuterClass.StatusCode getCode() {
-        com.service.grpc.CommunicationServiceOuterClass.StatusCode result = com.service.grpc.CommunicationServiceOuterClass.StatusCode.valueOf(code_);
-        return result == null ? com.service.grpc.CommunicationServiceOuterClass.StatusCode.UNRECOGNIZED : result;
+      public com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode getCode() {
+        com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode result = com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.valueOf(code_);
+        return result == null ? com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode.UNRECOGNIZED : result;
       }
       /**
        * <pre>
        * PingRequest will only use this field if succeeded
        * </pre>
        *
-       * <code>.com.service.grpc.StatusCode Code = 1;</code>
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
        */
-      public Builder setCode(com.service.grpc.CommunicationServiceOuterClass.StatusCode value) {
+      public Builder setCode(com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -2316,7 +2316,7 @@ public final class CommunicationServiceOuterClass {
        * PingRequest will only use this field if succeeded
        * </pre>
        *
-       * <code>.com.service.grpc.StatusCode Code = 1;</code>
+       * <code>.com.service.grpc.UploadStatusCode Code = 1;</code>
        */
       public Builder clearCode() {
         
@@ -6731,29 +6731,29 @@ public final class CommunicationServiceOuterClass {
       "RequestH\000\0222\n\nputRequest\030\007 \001(\0132\034.com.serv" +
       "ice.grpc.PutRequestH\000\0222\n\ngetRequest\030\010 \001(" +
       "\0132\034.com.service.grpc.GetRequestH\000B\t\n\007pay" +
-      "load\"\245\001\n\010Response\022*\n\004Code\030\001 \001(\0162\034.com.se" +
-      "rvice.grpc.StatusCode\022\013\n\003msg\030\002 \001(\t\022,\n\010me" +
-      "taData\030\003 \001(\0132\032.com.service.grpc.MetaData",
-      "\0222\n\013datFragment\030\004 \001(\0132\035.com.service.grpc" +
-      ".DatFragment\"\032\n\013PingRequest\022\013\n\003msg\030\001 \001(\t" +
-      "\"n\n\nPutRequest\022,\n\010metaData\030\001 \001(\0132\032.com.s" +
-      "ervice.grpc.MetaData\0222\n\013datFragment\030\002 \001(" +
-      "\0132\035.com.service.grpc.DatFragment\"n\n\nGetR" +
-      "equest\022,\n\010metaData\030\001 \001(\0132\032.com.service.g" +
-      "rpc.MetaData\0222\n\013queryParams\030\002 \001(\0132\035.com." +
-      "service.grpc.QueryParams\"/\n\013QueryParams\022" +
-      "\020\n\010from_utc\030\001 \001(\t\022\016\n\006to_utc\030\002 \001(\t\"B\n\010Met" +
-      "aData\022\014\n\004uuid\030\001 \001(\t\022\025\n\rnumOfFragment\030\002 \001",
-      "(\005\022\021\n\tmediaType\030\003 \001(\005\"2\n\013DatFragment\022\025\n\r" +
-      "timestamp_utc\030\001 \001(\t\022\014\n\004data\030\002 \001(\014*-\n\nSta" +
-      "tusCode\022\013\n\007Unknown\020\000\022\006\n\002Ok\020\001\022\n\n\006Failed\020\002" +
-      "2\343\001\n\024CommunicationService\022E\n\nPutHandler\022" +
-      "\031.com.service.grpc.Request\032\032.com.service" +
-      ".grpc.Response(\001\022E\n\nGetHandler\022\031.com.ser" +
-      "vice.grpc.Request\032\032.com.service.grpc.Res" +
-      "ponse0\001\022=\n\004Ping\022\031.com.service.grpc.Reque" +
-      "st\032\032.com.service.grpc.ResponseB\002H\001b\006prot" +
-      "o3"
+      "load\"\253\001\n\010Response\0220\n\004Code\030\001 \001(\0162\".com.se" +
+      "rvice.grpc.UploadStatusCode\022\013\n\003msg\030\002 \001(\t" +
+      "\022,\n\010metaData\030\003 \001(\0132\032.com.service.grpc.Me",
+      "taData\0222\n\013datFragment\030\004 \001(\0132\035.com.servic" +
+      "e.grpc.DatFragment\"\032\n\013PingRequest\022\013\n\003msg" +
+      "\030\001 \001(\t\"n\n\nPutRequest\022,\n\010metaData\030\001 \001(\0132\032" +
+      ".com.service.grpc.MetaData\0222\n\013datFragmen" +
+      "t\030\002 \001(\0132\035.com.service.grpc.DatFragment\"n" +
+      "\n\nGetRequest\022,\n\010metaData\030\001 \001(\0132\032.com.ser" +
+      "vice.grpc.MetaData\0222\n\013queryParams\030\002 \001(\0132" +
+      "\035.com.service.grpc.QueryParams\"/\n\013QueryP" +
+      "arams\022\020\n\010from_utc\030\001 \001(\t\022\016\n\006to_utc\030\002 \001(\t\"" +
+      "B\n\010MetaData\022\014\n\004uuid\030\001 \001(\t\022\025\n\rnumOfFragme",
+      "nt\030\002 \001(\005\022\021\n\tmediaType\030\003 \001(\005\"2\n\013DatFragme" +
+      "nt\022\025\n\rtimestamp_utc\030\001 \001(\t\022\014\n\004data\030\002 \001(\014*" +
+      "3\n\020UploadStatusCode\022\013\n\007Unknown\020\000\022\006\n\002Ok\020\001" +
+      "\022\n\n\006Failed\020\0022\343\001\n\024CommunicationService\022E\n" +
+      "\nPutHandler\022\031.com.service.grpc.Request\032\032" +
+      ".com.service.grpc.Response(\001\022E\n\nGetHandl" +
+      "er\022\031.com.service.grpc.Request\032\032.com.serv" +
+      "ice.grpc.Response0\001\022=\n\004Ping\022\031.com.servic" +
+      "e.grpc.Request\032\032.com.service.grpc.Respon" +
+      "seB\002H\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

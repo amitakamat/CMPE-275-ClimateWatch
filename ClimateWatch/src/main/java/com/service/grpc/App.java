@@ -1,10 +1,7 @@
 package com.service.grpc;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.logging.Logger;
-
-import com.sun.net.httpserver.HttpServer;
 
 import io.grpc.*;
 
@@ -16,19 +13,13 @@ public class App
 	
 	private void start() throws IOException {
 	    /* The port on which the server should run */
-	    int port = 9000;
+	    int port = 8000;
 	    //server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
 	    
-	    server = ServerBuilder.forPort(port)
-	        	.addService(new CommunicationServiceImpl())
-	        	.build();
-	    server.start();
-	     
-	    HttpServer httpserver = HttpServer.create(new InetSocketAddress(8000), 0);
-	    httpserver.createContext("/v1/getdata", new DataHandler());
-	    httpserver.setExecutor(null); 
-	    httpserver.start();
-	    
+//	    server = ServerBuilder.forPort(port)
+//	        	.addService(new CommunicationServiceImpl())
+//	        	.build().start();
+//	    
 	    logger.info("Server started, listening on " + port);
 	    
 	    Runtime.getRuntime().addShutdownHook(new Thread() {

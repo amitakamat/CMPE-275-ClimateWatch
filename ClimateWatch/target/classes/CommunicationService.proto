@@ -17,7 +17,7 @@ message Request {
 }
 
 message Response {
-  StatusCode Code = 1; // PingRequest will only use this field if succeeded
+  UploadStatusCode Code = 1; // PingRequest will only use this field if succeeded
   string msg = 2;
   MetaData metaData = 3;
   DatFragment datFragment = 4;
@@ -53,7 +53,7 @@ message DatFragment {
   bytes data = 2;
 }
 
-enum StatusCode {
+enum UploadStatusCode {
   Unknown = 0;
   Ok = 1;
   Failed = 2;
