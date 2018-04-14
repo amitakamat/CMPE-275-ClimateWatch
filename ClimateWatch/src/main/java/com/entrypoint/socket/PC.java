@@ -12,6 +12,7 @@ import gash.messaging.Message;
 import gash.messaging.Node;
 import gash.router.client.MessageClient;
 import gash.router.server.MessageServer;
+import routing.Pipe.Route;
 
 public class PC extends Node{
 
@@ -52,6 +53,7 @@ public class PC extends Node{
 		state = RState.Follower;
 		init();
 		otherNodes.add("169.254.204.172");
+		otherNodes.add("169.254.152.143");
 		
 		
 		
@@ -99,11 +101,16 @@ public class PC extends Node{
 		//if (msg.toString().contains("RequestVote"))*/
 		if(state == RState.Leader){
 			System.out.println("");
-			for (int i = 0; i < otherNodes.size() ; i++) {
+			int i=0;
+			
+			String data="Data";
+			while(true){
 				this.mc = new MessageClient(otherNodes.get(i),4568);
-				//
-				//mc.postMessage(retString.toString());
-							
+				i++;
+				mc.postMessage(data+String.valueOf(i));
+				if(i == otherNodes.size()){
+					i=0;
+				}
 			}
 			
 		}
@@ -187,12 +194,21 @@ public class PC extends Node{
 	        	//how to determineleader iP
 	            pc.setLeader(LeaderNodeIP);
 	            System.out.println("My leader is "+LeaderNodeIP);
+	            if(pc.ip==LeaderNodeIP){
+	            	System.out.println("I AM LEADER");
+	            	pc.state=RState.Leader;
+	            	Object msg;
+	            	msg=";";
+	            	Message m=new Message(10,((Route)msg).getPayload());
+	        		
+	            	pc.process(m);
+	            }
 	        }
 	    }
 	  
 	  
 	public void startElection() 
-	{
+	{;
 		state = RState.Candidate;
         voteCount = 1;
         currentTerm++;
