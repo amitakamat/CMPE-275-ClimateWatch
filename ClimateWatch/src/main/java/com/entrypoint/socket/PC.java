@@ -36,10 +36,14 @@ public class PC extends Node{
 		super(id);
 		this.ip = ip;
 		File cf=new File("resources/routing.conf");
-		this.ms=new MessageServer(cf);
+		this.ms=new MessageServer(cf,this);
+		this.ms.startServer();
 		
 		state = RState.Follower;
 		init();
+		
+		otherNodes.add("172.20.10.6");
+		System.out.println("Starting server");
 		//TODO set ip to INETAddress
 		
 		//TODO use MS
@@ -61,15 +65,15 @@ public class PC extends Node{
 	public void init()
 	{
 		
-		 Timer timer = new Timer();
-	     timer.schedule(new HeartBeatTask(), 10*1000);
+		// Timer timer = new Timer();
+	    // timer.schedule(new HeartBeatTask(), 10*1000);
 	}
 
 	
 	
 	@Override
 	public void process(Message msg) {
-		System.out.println("Message Received at" + msg);
+		System.out.println("Message Received at lalala" + msg);
 		
 	}
 	

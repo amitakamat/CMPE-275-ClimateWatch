@@ -28,16 +28,19 @@ public class Message {
 	private Direction direction = Direction.Forward;
 	private VectorClock clock;
 	private Delivery deliverAs = Delivery.Direct;
+	public String content;
 
-	public Message(int id) {
+	public Message(int id,String content) {
 		this.nodeId = id;
+		this.content=content;
 		clock = new VectorClock();
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("M").append(nodeId).append(" to: ").append(originator)
-				.append(", from: ").append(destination);
+		/*sb.append("M").append(nodeId).append(" to: ").append(originator)
+				.append(", from: ").append(destination);*/
+		sb.append(content);
 		return sb.toString();
 	}
 

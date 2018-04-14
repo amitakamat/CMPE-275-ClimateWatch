@@ -32,6 +32,8 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
+import gash.messaging.Message;
+import gash.messaging.Node;
 import gash.router.container.RoutingConf;
 import gash.router.server.resources.RouteResource;
 import io.netty.buffer.ByteBuf;
@@ -58,8 +60,11 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 	protected static DBCollection dbCollection;
 
 	private HashMap<String, String> routing;
+	
+	public Node n;
 
-	public ServerHandler(RoutingConf conf) {
+	public ServerHandler(RoutingConf conf,Node n) {
+		this.n=n;
 		if (conf != null)
 			routing = conf.asHashMap();
 		
@@ -185,11 +190,19 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         System.out.println(
             "Server received: " + msg);//in.toString(CharsetUtil.UTF_8));
        // ctx.writeAndFlush(Unpooled.copiedBuffer("Netty MAY JUNE rock!", CharsetUtil.UTF_8));
+        
+        
         Route.Builder rb = Route.newBuilder();
 		rb.setId(10);
 		rb.setPath("/message");
-		rb.setPayload("Yo Yo Yo");
-        ctx.channel().writeAndFlush(rb.build());
+		rb.setPayload("Passing vote request");
+		
+        //Route.Builder rb = Route.newBuilder();
+       //((Route.Builder)msg).getPayload();
+		
+		Message m=new Message(10,((Route)msg).getPayload());
+		this.n.process(m);
+        //ctx.channel().writeAndFlush(rb.build());
     }
 
     public void channelReadComplete(ChannelHandlerContext ctx) {

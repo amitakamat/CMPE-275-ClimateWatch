@@ -15,7 +15,7 @@ public class EntryPoint {
 	public static void main(String[] args) {
 		
 	// get ip
-//	 PC pc = new PC(1,"test");
+	 PC pc = new PC(1,"172.20.10.2");
 	 
 		class test
 		{
