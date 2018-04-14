@@ -1,8 +1,10 @@
 package com.entrypoint.socket;
 
 import java.io.File;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,12 +15,13 @@ import gash.router.server.MessageServer;
 
 public class PC extends Node{
 
-	Node LeaderNode = null;
+	String LeaderNodeIP = null;
 	boolean isLeader = false;
 	String ip = null;
 //	List<Node> otherNodes = new ArrayList<Node>();
 //	IPAddress
 	List<String> otherNodes = new ArrayList<String>();
+	
 	public MessageClient mc ;
 	public MessageServer ms ;
 	
@@ -29,6 +32,7 @@ public class PC extends Node{
     RState state;
 	private int voteCount;
 	private int currentTerm;
+	private int max;
 
 	
 	
@@ -37,12 +41,29 @@ public class PC extends Node{
 		this.ip = ip;
 		File cf=new File("resources/routing.conf");
 		this.ms=new MessageServer(cf,this);
-		this.ms.startServer();
+		max=0;
+		//this.ms.startServer();
+		
+		Runnable r = new MyRunnable(this.ms);
+		new Thread(r).start();
+		
+		
 		
 		state = RState.Follower;
 		init();
+		otherNodes.add("169.254.204.172");
 		
-		otherNodes.add("172.20.10.6");
+		
+		
+		//new ElectionMonitor(this).run();
+		
+		Timer timer = new Timer();
+		timer.schedule(new ElectionMonitor(this), 20*1000);
+	    timer.schedule(new InitialLeader(this), 40*1000);
+	    
+	     
+		
+		
 		System.out.println("Starting server");
 		//TODO set ip to INETAddress
 		
@@ -67,27 +88,48 @@ public class PC extends Node{
 		
 		// Timer timer = new Timer();
 	    // timer.schedule(new HeartBeatTask(), 10*1000);
+	     
 	}
 
 	
 	
 	@Override
 	public void process(Message msg) {
-		System.out.println("Message Received at lalala" + msg);
+		/*System.out.println("Message Received at lalala" + msg);
+		//if (msg.toString().contains("RequestVote"))*/
+		if(state == RState.Leader){
+			System.out.println("");
+			for (int i = 0; i < otherNodes.size() ; i++) {
+				this.mc = new MessageClient(otherNodes.get(i),4568);
+				//
+				//mc.postMessage(retString.toString());
+							
+			}
+			
+		}
+		
+		if(msg.toString().contains("RequestVote")){
+			String[] x = msg.toString().split(" ");
+			if(Integer.parseInt(x[2]) >max){
+				max=Integer.parseInt(x[2]);
+				LeaderNodeIP=x[0];
+			}
+		}
+			
 		
 	}
 	
 	
 	// how to constantly check for a leader?
-	public void setLeader(Node node)
+	public void setLeader(String ip)
 	{
-		this.LeaderNode = node;
+		this.LeaderNodeIP = ip;
 		
 	}
 	
-	public Node getLeader()
+	public String getLeader()
 	{
-		return LeaderNode;
+		return LeaderNodeIP;
 		
 	}
 	 protected void checkBeats()
@@ -130,12 +172,40 @@ public class PC extends Node{
 	        }
 	    }
 
+	  class InitialLeader extends TimerTask 
+	  {
+		  PC pc = null;	      
+
+	        public InitialLeader(PC pc)
+	        {
+	            this.pc = pc;
+	        }
+
+	        @Override
+	        public void run()
+	        {
+	        	//how to determineleader iP
+	            pc.setLeader(LeaderNodeIP);
+	            System.out.println("My leader is "+LeaderNodeIP);
+	        }
+	    }
+	  
+	  
 	public void startElection() 
 	{
 		state = RState.Candidate;
         voteCount = 1;
         currentTerm++;
-        sendRequestVoteNotice();
+        
+        Random rand = new Random();
+
+        int  n = rand.nextInt(1000) + 1;
+        max=n;
+        LeaderNodeIP=this.ip;
+        
+        System.out.println("My ID is"+n);
+
+        sendRequestVoteNotice(n);
         
         
         
@@ -144,11 +214,12 @@ public class PC extends Node{
 		
 	}
 
-	private void sendRequestVoteNotice() {
+	private void sendRequestVoteNotice(int id) {
+		
 		StringBuilder retString = new StringBuilder();
 		retString.append(this.ip + " " );
 		retString.append("RequestVote"+ " ");
-		retString.append(currentTerm);
+		retString.append(id);
 		for (int i = 0; i < otherNodes.size() ; i++) {
 			this.mc = new MessageClient(otherNodes.get(i),4568);
 			mc.postMessage(retString.toString());
@@ -163,5 +234,19 @@ public class PC extends Node{
 //        send(msg);
 		
 	}
+	
+	public class MyRunnable implements Runnable {
+			
+		MessageServer svr;
+
+		   public MyRunnable(MessageServer svr) {
+		       // store parameter for later user
+			   this.svr=svr;
+		   }
+
+		   public void run() {
+			   svr.startServer();
+		   }
+		}
 
 }
