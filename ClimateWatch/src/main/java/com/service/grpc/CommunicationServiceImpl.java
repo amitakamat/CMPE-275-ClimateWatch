@@ -12,7 +12,7 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.QueryBuilder;
 import com.mongodb.client.MongoCursor;
-import com.service.grpc.CommunicationServiceOuterClass.UploadStatusCode;
+import com.service.grpc.CommunicationServiceOuterClass.StatusCode;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 
@@ -33,7 +33,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		
 		
 		CommunicationServiceOuterClass.Response response = CommunicationServiceOuterClass.Response.newBuilder()
-  	          .setCode(UploadStatusCode.Ok)
+  	          .setCode(StatusCode.Ok)
   	          .setMsg(successMsg)
   	          .build();
 		
