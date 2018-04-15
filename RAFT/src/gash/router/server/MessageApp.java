@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Gash.
+E * Copyright 2016 Gash.
  *
  * This file and intellectual content is protected under the Apache License, version 2.0
  * (the "License"); you may not use this file except in compliance with the
@@ -27,12 +27,8 @@ public class MessageApp {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 0) {
-			System.out.println("usage: server <config file>");
-			System.exit(1);
-		}
 
-		File cf = new File(args[0]);
+		File cf = new File("resources/routing.conf");
 		try {
 			MessageServer svr = new MessageServer(cf);
 			svr.startServer();

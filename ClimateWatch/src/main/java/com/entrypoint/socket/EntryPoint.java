@@ -15,14 +15,14 @@ public class EntryPoint {
 	public static void main(String[] args) {
 		
 	// get ip
-//	 PC pc = new PC(1,"test");
+	 PC pc = new PC(1,"169.254.162.87");
 	 
-		class test
+		/*class test
 		{
 			
 		}
 	 // convert to a node
-		test test2 = new test();
+		test test2 = new test();*/
 	
 
 	

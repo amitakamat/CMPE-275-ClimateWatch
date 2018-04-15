@@ -15,6 +15,7 @@
  */
 package gash.router.client;
 
+import gash.leaderelection.raft.RaftMessage;
 import routing.Pipe.Route;
 
 /**
@@ -64,7 +65,7 @@ public class MessageClient {
 		Route.Builder rb = Route.newBuilder();
 		rb.setId(nextId());
 		rb.setPath("/message");
-		rb.setPayload(msg);
+		rb.setPayload(msg.toString());
 
 		try {
 			System.out.println("My ip is "+commConnection.host+"My port is "+commConnection.port);
