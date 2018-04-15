@@ -59,8 +59,13 @@ public class Client
       
       CommunicationServiceOuterClass.QueryParams queryParams =
 		      CommunicationServiceOuterClass.QueryParams.newBuilder()
+<<<<<<< Updated upstream
 		      		  .setFromUtc("2011/01/01 00:00:00")
 		      		  .setToUtc("2013/01/01 00:00:00")
+=======
+		      		  .setFromUtc("2018/03/21 01:00:00")
+		      		  .setToUtc("2018/03/21 22:20:00")
+>>>>>>> Stashed changes
 		      		//.setFromUtc("2017/01/01 00:00:00") *** Test for data not present
 		      		// .setToUtc("2018/01/01 00:00:00")
 		      		  .build();

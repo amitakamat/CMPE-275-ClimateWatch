@@ -34,4 +34,9 @@ public class MulticastReceiver extends Thread {
     		
     	}
     }
+    
+    public static void main(String[] args) {
+    	MulticastReceiver multicastReceiver = new MulticastReceiver();
+    	multicastReceiver.start();
+    }
 }
