@@ -7,8 +7,9 @@ public class EntryPoint {
 
 	public static void main(String[] args) throws Exception 
 	{
-		PC pc = new PC(1, getIP());
+		PC pc = PC.getInstance();
 		
+		//trying to keep main thread alive.
 		while(true)
 		{
 			Thread.sleep(1000);
