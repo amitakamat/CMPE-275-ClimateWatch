@@ -38,6 +38,9 @@ public class PC extends Node{
 	public MessageClient mc ;
 	public MessageServer ms ;
 	
+	
+	public static PC instance = null;
+	
     public enum RState {
         Follower, Candidate, Leader
     }
@@ -78,6 +81,16 @@ public class PC extends Node{
 		timer.schedule(new ElectionMonitor(this), 30*1000);
 		
 	    
+	}
+	
+	public static PC getInstance()
+	{
+		if(instance==null)
+		{
+			instance = new PC(1,EntryPoint.getIP());
+		}
+		return instance;
+		
 	}
 
 	public void initDB() {
