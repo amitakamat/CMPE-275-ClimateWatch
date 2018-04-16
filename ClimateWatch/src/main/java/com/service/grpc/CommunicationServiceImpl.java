@@ -100,13 +100,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	   		   for(int j =0; j< responseData.size(); j++) {
 	   			   System.out.println("Chunk Size: " + String.valueOf(chunkSize));
 	   			   DBObject record = responseData.get(j);
-		   			MetaData metadata = MetaData.newBuilder()
-		   	   		          .setUuid(String.valueOf(record.get("_id")))
-		   	   		          .setNumOfFragment(fragment)
-		   	   		          .setMediaType(3)
-		   	   		          .build();
 	   			    record.removeField("_id");
-		   			fragment++;
 		   			
 		   			String responseRecord = "";
 		   			for(int i=0; i<headers.length; i++) {
@@ -115,11 +109,14 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		   				else
 		   					responseRecord+=record.get(headers[i]) + "\t";
 		   			}
-		   			System.out.println("Record : " + responseRecord);
-		   			responseChunk += responseChunk + responseRecord;
+		   			responseChunk += responseRecord;
 		   			
 		   			if(chunkSize >= maxChunkSize || j>=responseData.size()-1) {
-		   				System.out.println("Record response : " + responseChunk);
+		   				MetaData metadata = MetaData.newBuilder()
+			   	   		          .setUuid(String.valueOf(fragment))
+			   	   		          .setNumOfFragment(fragment)
+			   	   		          .setMediaType(3)
+			   	   		          .build();
 			   			DatFragment dataFragment = DatFragment.newBuilder()
 			   			      		  .setData(ByteString.copyFromUtf8(responseChunk))
 			   			      		  .build();
@@ -129,7 +126,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 			   	   	          .setMetaData(metadata)
 			   	   	          .setDatFragment(dataFragment)
 			   	   	          .build();
-			
+			   		  System.out.println(responseChunk);
 			   	      responseObserver.onNext(response);
 			   	      responseChunk = "";
 			   	      chunkSize = 0;

@@ -61,7 +61,7 @@ public class Client
       
       QueryParams queryParams = QueryParams.newBuilder()
 		      		  .setFromUtc("2018-03-21 01:00:00")
-		      		  .setToUtc("2018-03-21 22:20:00")
+		      		  .setToUtc("2018-03-21 01:20:00")
 		      		//.setFromUtc("2017/01/01 00:00:00") *** Test for data not present
 		      		// .setToUtc("2018/01/01 00:00:00")
 		      		  .build();
@@ -82,7 +82,8 @@ public class Client
       while(getResponse.hasNext()) {
     	  //System.out.println(String.valueOf(getResponse.next().getDatFragment()).replace("\'", ""))
    	  //System.out.println(mapperObj.writeValueAsString(getResponse.next()));
-    	  System.out.println(getResponse.next());
+    	  String responseData =  getResponse.next().getDatFragment().getData().toStringUtf8();
+    	  System.out.println(responseData);
       }
 
 
