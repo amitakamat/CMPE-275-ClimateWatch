@@ -83,61 +83,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 }
 	}
 
-	/**
-	 * override this method to provide processing behavior. This implementation
-	 * mimics the routing we see in annotating classes to support a RESTful-like
-	 * behavior (e.g., jax-rs).
-	 * 
-	 * @param msg
-	 */
-	public void handleMessage(Route msg, Channel channel) {
-		if (msg == null) {
-			// TODO add logging
-			System.out.println("ERROR: Unexpected content - " + msg);
-			return;
-		}
 
-		System.out.println("---> " + msg.getId() + ": " + msg.getPath() + ", " + msg.getPayload());
-
-		try {
-			String clazz = routing.get(msg.getPath().toLowerCase());
-			if (clazz != null) {
-				RouteResource rsc = (RouteResource) Beans.instantiate(RouteResource.class.getClassLoader(), clazz);
-				try {
-					String reply = rsc.process(msg.getPayload());
-					System.out.println("---> reply: " + reply);
-					if (reply != null) {
-						Route.Builder rb = Route.newBuilder(msg);
-						rb.setPayload(reply);
-						channel.write(rb.build());
-
-						// Uncomment to query the database.
-						queryDB(msg.getPayload());
-						
-						
-						// Code to insert data in mongoDB
-						/*String uniqueID = UUID.randomUUID().toString();					
-						DBObject messageObject = new BasicDBObject("_id", uniqueID).append("messageID", msg.getId()).append("payload", msg.getPayload());
-						System.out.println(msg.getAllFields().toString());
-						dbCollection.insert(messageObject);*/
-					}
-				} catch (Exception e) {
-					// TODO add logging
-					Route.Builder rb = Route.newBuilder(msg);
-					rb.setPayload("Error: " + e.getMessage());
-					channel.write(rb.build());
-				}
-			} else {
-				// TODO add logging
-				System.out.println("ERROR: unknown path - " + msg.getPath());
-			}
-		} catch (Exception ex) {
-			// TODO add logging
-			System.out.println("ERROR: processing request - " + ex.getMessage());
-		}
-
-		System.out.flush();
-	}
 
 	/**
 	 * a message was received from the server. Here we extract the from and to date time,
@@ -164,28 +110,66 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 			System.out.println(ex.getMessage());
 		}
 	}
-	
-	/**
-	 * a message was received from the server. Here we dispatch the message to
-	 * the client's thread pool to minimize the time it takes to process other
-	 * messages.
-	 * 
-	 * @param ctx
-	 *            The channel the message was received from
-	 * @param msg
-	 *            The message
-	 */
-	/*@Override
-	protected void channelRead0(ChannelHandlerContext ctx, Route msg) throws Exception {
-		System.out.println("------------");
-		handleMessage(msg, ctx.channel());
+	public void writeToDB(String split){
+    	String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
+		 //MongoClient mongoClient = null;
+		 //DBCollection dbCollection = null; 
+		 
+    	System.out.println("Recieved a put query");
+    	System.out.println(split);
+    	String str = split.substring(0, split.length() - 2);
+    	//System.out.println(str);
+    	
+    	
+    	String[] entries=str.split("n");
+    	for(int i=0;i<entries.length;i++){
+    		entries[i]=entries[i].substring(0, entries[i].length() - 1);
+    		System.out.println(entries[i]);
+    	}
+    	
+    	System.out.println("After split");
+    	//System.out.println(lines[0]);
+    	int lineNo=0;
+    	String line;
+    	StringBuffer stringBuffer = new StringBuffer();
+    	int count=0;
+    	
+    	while(entries[lineNo]!=null){
+    		line=entries[lineNo];
+			if(line.length()!=0 && count>3) {
+				stringBuffer.append(line);
+				System.out.println("\n");
+				String[] lineArray = line.split(" ");
+				int size = 0;
+				int j = 0;
+				String uniqueID = UUID.randomUUID().toString();					
+				BasicDBObject messageObject = new BasicDBObject("_id", uniqueID);
+				for(int i=0; i<lineArray.length; i++) {
+					if(lineArray[i].length()!=0) {
+						if(j==1) {
+							//lineArray[i].replaceAll("/", " ");
+							try {
+								Date date = new SimpleDateFormat("yyyyMMdd/HHmm").parse(lineArray[i]);
+								messageObject.append(headers[j], date);
+							}
+							catch(Exception ex) {
+								System.out.println(ex.getMessage());
+							}
+						}
+						else {
+							messageObject.append(headers[j], lineArray[i]);
+						}
+						j++;
+					}
+				}
+				dbCollection.insert(messageObject);
+				System.out.println(line);
+				stringBuffer.append("\n\n\n");
+			}
+			count++;
+		}
 	}
 
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		logger.error("Unexpected exception from downstream.", cause);
-		ctx.close();
-	}*/
 	
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
         //ByteBuf in = (ByteBuf) msg;
@@ -203,90 +187,19 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         System.out.println(splitMesg[0]+"yay");
 
         if(splitMesg[0].contains("PUTQUERY")){
-        	String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
-			 //MongoClient mongoClient = null;
-			 //DBCollection dbCollection = null; 
-			 
-        	System.out.println("Recieved a put query");
-        	System.out.println(splitMesg[1]);
-        	String str = splitMesg[1].substring(0, splitMesg[1].length() - 2);
-        	System.out.println(str);
-        	
-        	
-        	String[] entries=str.split("\n");
-        	for(int i=0;i<entries.length;i++){
-        		System.out.println(entries[i]);
-        	}
-        	//String uniqueID = UUID.randomUUID().toString();	
-        	//BasicDBObject messageObject = new BasicDBObject("_id", uniqueID);
-        	
-        	String[] lines = splitMesg[1].split(" ",3);
-        	System.out.println("After split");
-        	System.out.println(lines[0]);
-        	int lineNo=0;
-        	String line;
-        	StringBuffer stringBuffer = new StringBuffer();
-        	int count=0;
-        	
-        	while(lines[lineNo]!=null){
-        		line=lines[lineNo];
-				if(line.length()!=0 && count>3) {
-					stringBuffer.append(line);
-					System.out.println("\n");
-					String[] lineArray = line.split(" ");
-					int size = 0;
-					int j = 0;
-					String uniqueID = UUID.randomUUID().toString();					
-					BasicDBObject messageObject = new BasicDBObject("_id", uniqueID);
-					for(int i=0; i<lineArray.length; i++) {
-						if(lineArray[i].length()!=0) {
-							if(j==1) {
-								//lineArray[i].replaceAll("/", " ");
-								try {
-									Date date = new SimpleDateFormat("yyyyMMdd/HHmm").parse(lineArray[i]);
-									messageObject.append(headers[j], date);
-								}
-								catch(Exception ex) {
-									System.out.println(ex.getMessage());
-								}
-							}
-							else {
-								messageObject.append(headers[j], lineArray[i]);
-							}
-							j++;
-						}
-					}
-					dbCollection.insert(messageObject);
-					System.out.println(line);
-					stringBuffer.append("\n\n\n");
-				}
-				count++;
-			}
-        	//String[] lineArray = line.split(" ");
-        	
-        	/*for(){
-        		
-        	}*/
+
+        	writeToDB(splitMesg[1]);
+        }
+        if(splitMesg[0].contains("GETQUERY")){
+
+        	//queryToDB(splitMesg[1]);
+        }
+        if(splitMesg[0].contains("ping")){
+
+        	//queryToDB(splitMesg[1]);
         }
         
         
-        
-        
-        //in.toString(CharsetUtil.UTF_8));
-       // ctx.writeAndFlush(Unpooled.copiedBuffer("Netty MAY JUNE rock!", CharsetUtil.UTF_8));
-        
-        
-        /*Route.Builder rb = Route.newBuilder();
-		rb.setId(10);
-		rb.setPath("/message");
-		rb.setPayload("Passing vote request");*/
-		
-        //Route.Builder rb = Route.newBuilder();
-       //((Route.Builder)msg).getPayload();
-		
-		//Message m=new Message(10,((Route)msg).getPayload());
-		//this.n.process(m);
-        //ctx.channel().writeAndFlush(rb.build());
     }
 
     public void channelReadComplete(ChannelHandlerContext ctx) {
