@@ -58,6 +58,8 @@ public class CommConnection {
 
 	// message processing is delegated to a threading model
 	private CommWorker worker;
+	
+	public Bootstrap bs;
 
 	/**
 	 * Create a connection instance to this host/port. On construction the
@@ -158,6 +160,7 @@ public class CommConnection {
 		try {
 			ServerInitClientSide si = new ServerInitClientSide(null, false);
 			Bootstrap b = new Bootstrap();
+			this.bs=b;
 			b.group(group).channel(NioSocketChannel.class).handler(si);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
 			b.option(ChannelOption.TCP_NODELAY, true);
