@@ -1,8 +1,12 @@
 package com.entrypoint.socket;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.sql.Time;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -10,16 +14,21 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+
 import data.ReadData;
 import gash.messaging.Message;
 import gash.messaging.Node;
 import gash.router.client.MessageClient;
 import gash.router.server.MessageServer;
 import redis.clients.jedis.Jedis;
-import routing.Pipe.Route;
 
 
 public class PC extends Node{
+	
 
 	String LeaderNodeIP = null;
 	boolean isLeader = false;
@@ -43,18 +52,19 @@ public class PC extends Node{
 	
 	public PC(int id,String ip) {
 		super(id);
+		parseMesowest();
 		
 		//update my ip
 		this.ip = ip;
 		
-		//Connect to redis
+		//Connect to local redis
 		initDB();
 	    
 	    
 		//Start local server
 	    File cf=new File("resources/routing.conf");
 		this.ms=new MessageServer(cf,this);
-		//this.mc=new MessageClient();
+		
 		Runnable startServerThread = new StartServerThread(this.ms);
 		new Thread(startServerThread).start();
 		
@@ -65,9 +75,8 @@ public class PC extends Node{
 		
 		Timer timer = new Timer();
 		//Scheduling elections in 30 sec
-//		timer.schedule(new ElectionMonitor(this), 30*1000);
-		//Decide the leader in 
-	    //timer.schedule(new InitialLeader(this), 20*1000);
+		timer.schedule(new ElectionMonitor(this), 30*1000);
+		
 	    
 	}
 
@@ -84,13 +93,6 @@ public class PC extends Node{
 		    jedis.hset("IP-Map", String.valueOf(n), this.ip);
 	}
 	
-	public void init()
-	{
-		
-		// Timer timer = new Timer();
-	    // timer.schedule(new HeartBeatTask(), 10*1000);
-	     
-	}
 
 	
 	public void disperseData(){
@@ -100,17 +102,9 @@ public class PC extends Node{
 		}
 		
 	}
+	
 	@Override
 	public void process(Message msg) {
-	
-		
-		if(msg.toString().contains("RequestVote")){
-			String[] x = msg.toString().split(" ");
-			if(Integer.parseInt(x[2]) >max){
-				max=Integer.parseInt(x[2]);
-				LeaderNodeIP=x[0];
-			}
-		}
 			
 		
 	}
@@ -193,37 +187,83 @@ public class PC extends Node{
             	
 	        }
 	    }
-
-	  class InitialLeader extends TimerTask 
-	  {
-		  PC pc = null;	      
-
-	        public InitialLeader(PC pc)
-	        {
-	            this.pc = pc;
-	        }
-
-	        @Override
-	        public void run()
-	        {
-	        	//how to determineleader iP
-	            pc.setLeader(LeaderNodeIP);
-	            System.out.println("My leader is "+LeaderNodeIP);
-	            if(pc.ip==LeaderNodeIP){
-	            	System.out.println("I AM LEADER");
-	            	pc.state=RState.Leader;
-	            	/*Object msg;
-	            	msg=";";
-	            	Message m=new Message(10,((Route)msg).getPayload());
-	        		
-	            	pc.process(m);*/
-	            	pc.disperseData();
-	            }
-	        }
-	    }
 	  
-	  
+	  public String addMessageTypeJSON(String content){
+			StringBuilder sb=new StringBuilder();
+			sb.append("'Type:JSON',").append("'").append(content).append("'");
+			return sb.toString();
+		}
+		public String addMessageTypeQUERY(String content){
+			StringBuilder sb=new StringBuilder();
+			sb.append("'Type:QUERY',").append("'").append(content).append("'");
+			return sb.toString();
+		}
 
+		
+	  public void parseMesowest() {
+		   String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
+			 MongoClient mongoClient = null;
+			 DBCollection dbCollection = null; 
+			try {
+				if (mongoClient == null) {
+					try {
+						//mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+						mongoClient = new MongoClient("localhost", 27017);
+						DB messageDB = mongoClient.getDB("messagesDB");
+						dbCollection = messageDB.getCollection("data");
+					}
+					catch(Exception e) {
+						System.out.println(e.getMessage());
+					}
+				}
+				File file = new File("/Users/mulumoodi/Downloads/11.mesowest.out");
+				FileReader fileReader = new FileReader(file);
+				BufferedReader bufferedReader = new BufferedReader(fileReader);
+				StringBuffer stringBuffer = new StringBuffer();
+				String line;
+				int count = 0;
+				while ((line = bufferedReader.readLine()) != null) {
+					if(line.length()!=0 && count>3) {
+						stringBuffer.append(line);
+						System.out.println("\n");
+						String[] lineArray = line.split(" ");
+						int size = 0;
+						int j = 0;
+						String uniqueID = UUID.randomUUID().toString();					
+						BasicDBObject messageObject = new BasicDBObject("_id", uniqueID);
+						for(int i=0; i<lineArray.length; i++) {
+							if(lineArray[i].length()!=0) {
+								if(j==1) {
+									//lineArray[i].replaceAll("/", " ");
+									try {
+										Date date = new SimpleDateFormat("yyyyMMdd/HHmm").parse(lineArray[i]);
+										messageObject.append(headers[j], date);
+									}
+									catch(Exception ex) {
+										System.out.println(ex.getMessage());
+									}
+								}
+								else {
+									messageObject.append(headers[j], lineArray[i]);
+								}
+								j++;
+							}
+						}
+						dbCollection.insert(messageObject);
+						System.out.println(line);
+						stringBuffer.append("\n\n\n");
+					}
+					count++;
+				}
+				fileReader.close();
+				//System.out.println("Contents of file:");
+				System.out.println(stringBuffer.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} 
+
+	
 	
 	public class StartServerThread implements Runnable {
 			

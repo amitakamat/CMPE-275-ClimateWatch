@@ -32,7 +32,7 @@ public class EntryPoint {
 		try {
 			InetAddress ipAddr = InetAddress.getLocalHost();
 			System.out.println(ipAddr.getHostAddress());
-			retString = ipAddr.toString();
+			retString = ipAddr.getHostAddress().toString();
 		} catch (UnknownHostException ex) {
 			ex.printStackTrace();
 		}
