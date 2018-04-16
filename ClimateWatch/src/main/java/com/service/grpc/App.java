@@ -1,7 +1,10 @@
 package com.service.grpc;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.logging.Logger;
+
+import com.sun.net.httpserver.HttpServer;
 
 import io.grpc.*;
 
@@ -13,14 +16,22 @@ public class App
 	
 	private void start() throws IOException {
 	    /* The port on which the server should run */
-	    int port = 8000;
-	    //server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
+	    int grpcport = 8080;
+	   // int httpport = 8000;
+	   // server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
 	    
-//	    server = ServerBuilder.forPort(port)
-//	        	.addService(new CommunicationServiceImpl())
-//	        	.build().start();
-//	    
-	    logger.info("Server started, listening on " + port);
+	    server = ServerBuilder.forPort(grpcport)
+	        	.addService(new CommunicationServiceImpl())
+	        	.build();
+	    server.start();
+	     
+	    /*HttpServer httpserver = HttpServer.create(new InetSocketAddress(httpport), 0);
+	    httpserver.createContext("/v1/getbydate", new DataHandler());
+	    httpserver.setExecutor(null); 
+	    httpserver.start();*/
+	    
+	    logger.info("GRPC Server started, listening on " + grpcport);
+	   // logger.info("GRPC Server started, listening on " + httpport);
 	    
 	    Runtime.getRuntime().addShutdownHook(new Thread() {
 	      @Override

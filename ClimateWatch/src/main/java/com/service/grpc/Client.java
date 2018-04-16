@@ -1,7 +1,13 @@
 package com.service.grpc;
 
-import com.google.protobuf.ByteString;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.TimeZone;
 
+import com.google.protobuf.ByteString;
+import org.codehaus.jackson.map.ObjectMapper;
+import com.cmpe275.grpcComm.*;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 
@@ -9,40 +15,36 @@ public class Client
 {
     public static void main( String[] args ) throws Exception
     {
-      final ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:8000")
+      final ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:8080") //ManagedChannelBuilder.forTarget("169.254.79.93:8080")
         .usePlaintext(true)
         .build();
       
-      
-//      CommunicationServiceOuterClass.PingRequest pingRequest =
-//      CommunicationServiceOuterClass.PingRequest.newBuilder()
-//          .setMsg("Sample Ping Request")
-//          .build();
-//
-//      CommunicationServiceGrpc.CommunicationServiceBlockingStub stub = CommunicationServiceGrpc.newBlockingStub(channel);
-//      CommunicationServiceOuterClass.Request request =
-//      CommunicationServiceOuterClass.Request.newBuilder()
-//          .setFromSender("from sender")
-//          .setToReceiver("to Receiver")
-//          .setPing(pingRequest)
-//          .build();
-//
-//      CommunicationServiceOuterClass.Response response = stub.ping(request);
-//      System.out.println(response);
-//      
-      /*CommunicationServiceOuterClass.MetaData metadata =
-		      CommunicationServiceOuterClass.MetaData.newBuilder()
+      System.out.println("Client started....\n\n");
+      PingRequest pingRequest =PingRequest.newBuilder()
+          .setMsg("Sample Ping Request")
+          .build();
+
+      CommunicationServiceGrpc.CommunicationServiceBlockingStub stub = CommunicationServiceGrpc.newBlockingStub(channel);
+      Request request =Request.newBuilder()
+          .setFromSender("from sender")
+          .setToReceiver("to Receiver")
+          .setPing(pingRequest)
+          .build();
+
+      Response response = stub.ping(request);
+      System.out.println(response);
+     
+      MetaData metadata = MetaData.newBuilder()
 		          .setUuid("12345")
 		          .setNumOfFragment(1)
 		          .setMediaType(3)
 		          .build();
    
-   CommunicationServiceOuterClass.DatFragment dataFragment =
-		      CommunicationServiceOuterClass.DatFragment.newBuilder()
+      DatFragment dataFragment = DatFragment.newBuilder()
 		      		  .setData(ByteString.copyFromUtf8("sample raw bytes"))
 		      		  .build();
    
-   CommunicationServiceOuterClass.PutRequest putRequest =
+   /*CommunicationServiceOuterClass.PutRequest putRequest =
 		      CommunicationServiceOuterClass.PutRequest.newBuilder()
 		      		  .setDatFragment(dataFragment)
 		      		  .setMetaData(metadata)
@@ -55,31 +57,35 @@ public class Client
 		          .build();
    	  response = stub.putHandler(request);
 
-      System.out.println(response);
+      System.out.println(response);*/
       
-      CommunicationServiceOuterClass.QueryParams queryParams =
-		      CommunicationServiceOuterClass.QueryParams.newBuilder()
-		      		  .setFromUtc("2011/01/01 00:00:00")
-		      		  .setToUtc("2013/01/01 00:00:00")
+      QueryParams queryParams = QueryParams.newBuilder()
+		      		  .setFromUtc("2018-03-21 01:00:00")
+		      		  .setToUtc("2018-03-21 01:20:00")
 		      		//.setFromUtc("2017/01/01 00:00:00") *** Test for data not present
 		      		// .setToUtc("2018/01/01 00:00:00")
 		      		  .build();
       
       
-      CommunicationServiceOuterClass.GetRequest getRequest =
-		      CommunicationServiceOuterClass.GetRequest.newBuilder()
+      GetRequest getRequest = GetRequest.newBuilder()
 		      		  .setMetaData(metadata)
 		      		  .setQueryParams(queryParams)
 		      		  .build();
-      request = CommunicationServiceOuterClass.Request.newBuilder()
+      request = Request.newBuilder()
 	          .setFromSender("from sender")
 	          .setToReceiver("to Receiver")
 	          .setGetRequest(getRequest)
 	          .build();
+      //ObjectMapper mapperObj = new ObjectMapper();
       
-      response = stub.getHandler(request);
+      Iterator<Response> getResponse = stub.getHandler(request);
+      while(getResponse.hasNext()) {
+    	  //System.out.println(String.valueOf(getResponse.next().getDatFragment()).replace("\'", ""))
+   	  //System.out.println(mapperObj.writeValueAsString(getResponse.next()));
+    	  String responseData =  getResponse.next().getDatFragment().getData().toStringUtf8();
+    	  System.out.println(responseData);
+      }
 
-      System.out.println(response);*/
 
       channel.shutdownNow();
     }

@@ -1,6 +1,9 @@
 syntax = "proto3";
 
-package com.service.grpc;
+package grpcComm;
+option java_multiple_files = true;
+option java_package = "com.cmpe275.grpcComm";
+option java_outer_classname = "DataProto";
 
 option optimize_for = SPEED;
 
@@ -17,7 +20,7 @@ message Request {
 }
 
 message Response {
-  UploadStatusCode Code = 1; // PingRequest will only use this field if succeeded
+  StatusCode Code = 1; // PingRequest will only use this field if succeeded
   string msg = 2;
   MetaData metaData = 3;
   DatFragment datFragment = 4;
@@ -53,14 +56,14 @@ message DatFragment {
   bytes data = 2;
 }
 
-enum UploadStatusCode {
+enum StatusCode {
   Unknown = 0;
   Ok = 1;
   Failed = 2;
 }
 
 service CommunicationService {
-  rpc PutHandler(stream Request) returns (Response);
-  rpc GetHandler(Request) returns (stream Response);
-  rpc Ping(Request) returns (Response);
+  rpc putHandler(stream Request) returns (Response);
+  rpc getHandler(Request) returns (stream Response);
+  rpc ping(Request) returns (Response);
 }
