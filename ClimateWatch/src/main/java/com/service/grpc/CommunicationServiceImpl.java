@@ -12,6 +12,9 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.QueryBuilder;
 import com.mongodb.client.MongoCursor;
+
+import gash.router.client.MessageClient;
+
 import com.cmpe275.grpcComm.CommunicationServiceGrpc;
 import com.cmpe275.grpcComm.*;
 import com.mongodb.BasicDBObject;
@@ -24,12 +27,31 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import com.entrypoint.socket.PC;
 
 public class CommunicationServiceImpl extends CommunicationServiceGrpc.CommunicationServiceImplBase {   
 	protected static MongoClient mongoClient;
 	protected static DBCollection dbCollection; 
 	static String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
 	static int maxChunkSize = 10;
+	private List<String> localnodes;
+	private PC pc;
+	
+	public CommunicationServiceImpl(){
+		
+	}
+	public CommunicationServiceImpl(PC pc){
+		this.pc=pc;
+		this.localnodes=pc.otherNodes;
+		
+	}
+	
+	/*	int rr=0;
+	 	onRecievingMesg
+	 		mc = new MessageClient(otherNodes.get(i%otherNodes.size()),4568);
+	 		mc.postMessage(mesg);
+	 		rr++;
+	 */
 	
 	public void ping(Request request,
           StreamObserver<Response> responseObserver) {
@@ -144,6 +166,12 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	        public void onNext(Request request) {
 	        	try {
 		        	String receivedMessage = request.getPutRequest().getDatFragment().getData().toStringUtf8();
+		        	
+		        	for(int i=0;i<localnodes.size();i++){	
+		        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
+		        		
+		        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
+		        	}
 		    	    System.out.println("Received request : "+ receivedMessage);
 		    	    chunksReceived++;
 		    	    

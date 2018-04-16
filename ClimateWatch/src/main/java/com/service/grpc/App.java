@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.logging.Logger;
 
+import com.entrypoint.socket.PC;
 import com.sun.net.httpserver.HttpServer;
 
 import io.grpc.*;
@@ -13,6 +14,36 @@ public class App
 	private static final Logger logger = Logger.getLogger(App.class.getName());
 
 	private Server server;
+	
+	public void start(PC pc) throws IOException {
+	    /* The port on which the server should run */
+	    int grpcport = 8080;
+	   // int httpport = 8000;
+	   // server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
+	    
+	    server = ServerBuilder.forPort(grpcport)
+	        	.addService(new CommunicationServiceImpl(pc))
+	        	.build();
+	    server.start();
+	     
+	    /*HttpServer httpserver = HttpServer.create(new InetSocketAddress(httpport), 0);
+	    httpserver.createContext("/v1/getbydate", new DataHandler());
+	    httpserver.setExecutor(null); 
+	    httpserver.start();*/
+	    
+	    logger.info("GRPC Server started, listening on " + grpcport);
+	   // logger.info("GRPC Server started, listening on " + httpport);
+	    
+	    Runtime.getRuntime().addShutdownHook(new Thread() {
+	      @Override
+	      public void run() {
+	        // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+	        System.err.println("*** shutting down gRPC server since JVM is shutting down");
+	        App.this.stop();
+	        System.err.println("*** server shut down");
+	      }
+	    });
+	  }
 	
 	private void start() throws IOException {
 	    /* The port on which the server should run */

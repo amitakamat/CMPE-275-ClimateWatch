@@ -71,11 +71,13 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		if (mongoClient == null) {
 			try {
 				//mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+				System.out.println("Is this error point");
 				mongoClient = new MongoClient("localhost", 27017);
 				DB messageDB = mongoClient.getDB("messagesDB");
-				dbCollection = messageDB.getCollection("messages");
+				dbCollection = messageDB.getCollection("data");
 			}
 			catch(Exception e) {
+				System.out.println("Is this error point");
 				System.out.println(e.getMessage());
 			}
 }
@@ -187,21 +189,103 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 	
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
         //ByteBuf in = (ByteBuf) msg;
+		//Route.Builder rb = Route.newBuilder();
+	      // ((Route.Builder)msg).getPayload();
+		String recvdMesg=msg.toString();//((Route.Builder)msg).getPayload();
         System.out.println(
-            "Server received: " + msg);//in.toString(CharsetUtil.UTF_8));
+            "Server received: " + recvdMesg);
+        
+        recvdMesg=recvdMesg.split("payload: \"")[1].toString();
+        System.out.println("String is below");
+        System.out.println(recvdMesg);
+        
+        String[] splitMesg=recvdMesg.split(" ",2);
+        System.out.println(splitMesg[0]+"yay");
+
+        if(splitMesg[0].contains("PUTQUERY")){
+        	String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
+			 //MongoClient mongoClient = null;
+			 //DBCollection dbCollection = null; 
+			 
+        	System.out.println("Recieved a put query");
+        	System.out.println(splitMesg[1]);
+        	String str = splitMesg[1].substring(0, splitMesg[1].length() - 2);
+        	System.out.println(str);
+        	
+        	
+        	String[] entries=str.split("\n");
+        	for(int i=0;i<entries.length;i++){
+        		System.out.println(entries[i]);
+        	}
+        	//String uniqueID = UUID.randomUUID().toString();	
+        	//BasicDBObject messageObject = new BasicDBObject("_id", uniqueID);
+        	
+        	String[] lines = splitMesg[1].split(" ",3);
+        	System.out.println("After split");
+        	System.out.println(lines[0]);
+        	int lineNo=0;
+        	String line;
+        	StringBuffer stringBuffer = new StringBuffer();
+        	int count=0;
+        	
+        	while(lines[lineNo]!=null){
+        		line=lines[lineNo];
+				if(line.length()!=0 && count>3) {
+					stringBuffer.append(line);
+					System.out.println("\n");
+					String[] lineArray = line.split(" ");
+					int size = 0;
+					int j = 0;
+					String uniqueID = UUID.randomUUID().toString();					
+					BasicDBObject messageObject = new BasicDBObject("_id", uniqueID);
+					for(int i=0; i<lineArray.length; i++) {
+						if(lineArray[i].length()!=0) {
+							if(j==1) {
+								//lineArray[i].replaceAll("/", " ");
+								try {
+									Date date = new SimpleDateFormat("yyyyMMdd/HHmm").parse(lineArray[i]);
+									messageObject.append(headers[j], date);
+								}
+								catch(Exception ex) {
+									System.out.println(ex.getMessage());
+								}
+							}
+							else {
+								messageObject.append(headers[j], lineArray[i]);
+							}
+							j++;
+						}
+					}
+					dbCollection.insert(messageObject);
+					System.out.println(line);
+					stringBuffer.append("\n\n\n");
+				}
+				count++;
+			}
+        	//String[] lineArray = line.split(" ");
+        	
+        	/*for(){
+        		
+        	}*/
+        }
+        
+        
+        
+        
+        //in.toString(CharsetUtil.UTF_8));
        // ctx.writeAndFlush(Unpooled.copiedBuffer("Netty MAY JUNE rock!", CharsetUtil.UTF_8));
         
         
-        Route.Builder rb = Route.newBuilder();
+        /*Route.Builder rb = Route.newBuilder();
 		rb.setId(10);
 		rb.setPath("/message");
-		rb.setPayload("Passing vote request");
+		rb.setPayload("Passing vote request");*/
 		
         //Route.Builder rb = Route.newBuilder();
        //((Route.Builder)msg).getPayload();
 		
-		Message m=new Message(10,((Route)msg).getPayload());
-		this.n.process(m);
+		//Message m=new Message(10,((Route)msg).getPayload());
+		//this.n.process(m);
         //ctx.channel().writeAndFlush(rb.build());
     }
 
@@ -210,8 +294,8 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		rb.setId(10);
 		rb.setPath("/message");
 		rb.setPayload("Yo Yo Yo");
-        ctx.writeAndFlush(rb.build())
-            .addListener(ChannelFutureListener.CLOSE);
+        /*ctx.writeAndFlush(rb.build())
+            .addListener(ChannelFutureListener.CLOSE);*/
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {

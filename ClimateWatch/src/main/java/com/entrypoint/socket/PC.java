@@ -18,6 +18,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import com.service.grpc.App;
 
 import data.ReadData;
 import gash.messaging.Message;
@@ -33,10 +34,12 @@ public class PC extends Node{
 	String LeaderNodeIP = null;
 	boolean isLeader = false;
 	String ip = null;
-	List<String> otherNodes = new ArrayList<String>();
+	public List<String> otherNodes = new ArrayList<String>();
 	
 	public MessageClient mc ;
 	public MessageServer ms ;
+	
+	public App appServer;
 	
 	
 	public static PC instance = null;
@@ -55,7 +58,7 @@ public class PC extends Node{
 	
 	public PC(int id,String ip) {
 		super(id);
-		parseMesowest();
+		//parseMesowest();
 		
 		//update my ip
 		this.ip = ip;
@@ -78,7 +81,7 @@ public class PC extends Node{
 		
 		Timer timer = new Timer();
 		//Scheduling elections in 30 sec
-		timer.schedule(new ElectionMonitor(this), 30*1000);
+		timer.schedule(new ElectionMonitor(this), 3*1000);
 		
 	    
 	}
@@ -192,8 +195,14 @@ public class PC extends Node{
 	        	System.out.println("Leader is"+maxIP);
 	        	if(pc.ip.equals(maxIP)){
 	        		pc.state=RState.Leader;
-	        		pc.disperseData();
-	        		
+	        		//pc.disperseData();
+	        		appServer=new App();
+	        		try {
+						appServer.start(pc);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 	        	}
 	        	
             	
@@ -206,9 +215,9 @@ public class PC extends Node{
 			sb.append("'Type:JSON',").append("'").append(content).append("'");
 			return sb.toString();
 		}
-		public String addMessageTypeQUERY(String content){
+		public String addMessageTypePUTQUERY(String content){
 			StringBuilder sb=new StringBuilder();
-			sb.append("'Type:QUERY',").append("'").append(content).append("'");
+			sb.append("Type:PUTQUERY	").append(content);
 			return sb.toString();
 		}
 
