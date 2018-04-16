@@ -20,6 +20,7 @@ import com.mongodb.BasicDBObjectBuilder;
 import org.bson.Document;
 import java.util.Date;
 import java.util.Iterator;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,122 +46,140 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	     responseObserver.onCompleted();
 	}
 	
-    public void putHandler(StreamObserver<Request> request,
-           StreamObserver<Response> responseObserver) {
-
-		   System.out.println("Received a PUT request");
-		    String successMsg = "Put call Successfull";
-    	   
-    	 /*  System.out.println(request.getPutRequest().toString().length());
-       else {
-    	   successMsg = "Get call Successfull";
-    	   CommunicationServiceOuterClass.QueryParams params = request.getGetRequest().getQueryParams();
-    	   if (queryDB(params.getFromUtc(), params.getToUtc()))
-    		   successMsg = "Data present";
-    	   else
-    		   successMsg = "Data not present";
-       }	   
-       
-       CommunicationServiceOuterClass.MetaData metadata =
-    		      CommunicationServiceOuterClass.MetaData.newBuilder()
-    		          .setUuid("12345")
-    		          .setNumOfFragment(1)
-    		          .setMediaType(3)
-    		          .build();
-       
-       CommunicationServiceOuterClass.DatFragment dataFragment =
- 		      CommunicationServiceOuterClass.DatFragment.newBuilder()
- 		      		  .setData(ByteString.copyFromUtf8("sample raw bytes"))
- 		      		  .build();
-
-       CommunicationServiceOuterClass.Response response = CommunicationServiceOuterClass.Response.newBuilder()
-    	          .setMetaData(metadata)
-    	          .setDatFragment(dataFragment)
-    	          .build();
-//
-//       responseObserver.onNext(response);
-//       responseObserver.onCompleted();*/
-    }
-//	
     public void getHandler(Request request, StreamObserver<Response> responseObserver) {
 
 		   System.out.println("Get call Successfull");
 		   String responseMsg ;
-   	   QueryParams params = request.getGetRequest().getQueryParams();
-   	   try {  
-		   	Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getFromUtc());
-			Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getToUtc());
-			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, "", "");
-	   	   
-	   	   if (!responseData.isEmpty()) {
-	   		responseMsg = "Data present";
-	   		   int fragment = 1;
-	   		   int chunkSize = 0;
-   			   String responseChunk ="";
-	   		   for(int j =0; j< responseData.size(); j++) {
-	   			   System.out.println("Chunk Size: " + String.valueOf(chunkSize));
-	   			   DBObject record = responseData.get(j);
-	   			    record.removeField("_id");
-		   			
-		   			String responseRecord = "";
-		   			for(int i=0; i<headers.length; i++) {
-		   				if(i == headers.length-1)
-		   					responseRecord+=record.get(headers[i]) + "\n";
-		   				else
-		   					responseRecord+=record.get(headers[i]) + "\t";
-		   			}
-		   			responseChunk += responseRecord;
-		   			
-		   			if(chunkSize >= maxChunkSize || j>=responseData.size()-1) {
-		   				MetaData metadata = MetaData.newBuilder()
-			   	   		          .setUuid(String.valueOf(fragment))
-			   	   		          .setNumOfFragment(fragment)
-			   	   		          .setMediaType(3)
-			   	   		          .build();
-			   			DatFragment dataFragment = DatFragment.newBuilder()
-			   			      		  .setData(ByteString.copyFromUtf8(responseChunk))
-			   			      		  .build();
+		   QueryParams params = request.getGetRequest().getQueryParams();
+	   	   try {  
+			   	Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getFromUtc());
+				Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getToUtc());
+				List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, "", "");
+		   	   
+		   	   if (!responseData.isEmpty()) {
+		   		responseMsg = "Data present";
+		   		   int fragment = 1;
+		   		   int chunkSize = 0;
+	   			   String responseChunk ="";
+		   		   for(int j =0; j< responseData.size(); j++) {
+		   			   System.out.println("Chunk Size: " + String.valueOf(chunkSize));
+		   			   DBObject record = responseData.get(j);
+		   			    record.removeField("_id");
 			   			
-			   			Response response =Response.newBuilder()
-			   	   	          .setMsg(responseMsg)
-			   	   	          .setMetaData(metadata)
-			   	   	          .setDatFragment(dataFragment)
-			   	   	          .build();
-			   		  System.out.println(responseChunk);
-			   	      responseObserver.onNext(response);
-			   	      responseChunk = "";
-			   	      chunkSize = 0;
+			   			String responseRecord = "";
+			   			for(int i=0; i<headers.length; i++) {
+			   				if(i == headers.length-1)
+			   					responseRecord+=record.get(headers[i]) + "\n";
+			   				else
+			   					responseRecord+=record.get(headers[i]) + "\t";
+			   			}
+			   			responseChunk += responseRecord;
+			   			
+			   			if(chunkSize >= maxChunkSize || j>=responseData.size()-1) {
+			   				MetaData metadata = MetaData.newBuilder()
+				   	   		          .setUuid(String.valueOf(fragment))
+				   	   		          .setNumOfFragment(fragment)
+				   	   		          .setMediaType(3)
+				   	   		          .build();
+				   			DatFragment dataFragment = DatFragment.newBuilder()
+				   			      		  .setData(ByteString.copyFromUtf8(responseChunk))
+				   			      		  .build();
+				   			
+				   			Response response =Response.newBuilder()
+				   	   	          .setMsg(responseMsg)
+				   	   	          .setMetaData(metadata)
+				   	   	          .setDatFragment(dataFragment)
+				   	   	          .build();
+				   		  System.out.println(responseChunk);
+				   	      responseObserver.onNext(response);
+				   	      responseChunk = "";
+				   	      chunkSize = 0;
+			   		   }
+			   		chunkSize++;
 		   		   }
-		   		chunkSize++;
-	   		   }
-		   			
-		   	   responseObserver.onCompleted();
-	   	   }
-	   	   else {
-	   		   responseMsg = "Data not present";	   
-	      
-		       MetaData metadata = MetaData.newBuilder()
-		   		          .setUuid("")
-		   		          .setNumOfFragment(1)
-		   		          .setMediaType(3)
-		   		          .build();
+			   			
+			   	   responseObserver.onCompleted();
+		   	   }
+		   	   else {
+		   		   responseMsg = "Data not present";	   
 		      
-		      DatFragment dataFragment = DatFragment.newBuilder()
-				      		  .setData(ByteString.copyFromUtf8(""))
+			       MetaData metadata = MetaData.newBuilder()
+			   		          .setUuid("")
+			   		          .setNumOfFragment(1)
+			   		          .setMediaType(3)
+			   		          .build();
+			      
+			      DatFragment dataFragment = DatFragment.newBuilder()
+					      		  .setData(ByteString.copyFromUtf8(""))
+					      		  .build();
+			
+			      Response response = Response.newBuilder()
+			   	          .setMsg(responseMsg)
+			   	          .setMetaData(metadata)
+			   	          .setDatFragment(dataFragment)
+			   	          .build();
+			
+			      responseObserver.onNext(response);
+			      responseObserver.onCompleted();
+		   	   } 
+	    }
+	    catch(Exception ex) {
+	    	System.out.println(ex.getMessage());
+	    }
+    }
+    
+    public StreamObserver<Request> putHandler(final StreamObserver<Response> responseObserver) {
+    	System.out.println("Received a PUT request");
+	    
+	    System.out.println();
+	    
+	    File f = new File("//mnt//c//");
+	    System.out.println("Printing the total space");
+	    System.out.println(f.getTotalSpace()/1000000.00 +" Megabytes");
+	    
+	    return new StreamObserver<Request>() {
+		    int chunksReceived = 0;
+
+	        @Override
+	        public void onNext(Request request) {
+	        	try {
+		        	String receivedMessage = request.getPutRequest().getDatFragment().getData().toStringUtf8();
+		    	    System.out.println("Received request : "+ receivedMessage);
+		    	    chunksReceived++;
+		    	    
+	    			Thread.sleep(1000);
+	        	} catch(Exception ex) {
+	        		System.out.println(ex.getMessage());
+	        	}
+	        }
+
+	        @Override
+	        public void onError(Throwable t) {
+	          System.out.println(t.getMessage());
+	        }
+
+	        @Override
+	        public void onCompleted() {
+	        	System.out.println("Complete called");
+	        	MetaData metadata = MetaData.newBuilder()
+				          .setUuid("12345")
+				          .setNumOfFragment(1)
+				          .setMediaType(3)
+				          .build();
+		   
+	        	DatFragment dataFragment = DatFragment.newBuilder()
+				      		  .setData(ByteString.copyFromUtf8(String.valueOf(chunksReceived) + " Message received"))
 				      		  .build();
 		
-		      Response response = Response.newBuilder()
-		   	          .setMsg(responseMsg)
-		   	          .setMetaData(metadata)
-		   	          .setDatFragment(dataFragment)
-		   	          .build();
-		
-		      responseObserver.onNext(response);
-		      responseObserver.onCompleted();
-	   	   }
-    }
-    catch(Exception ex) {
-    	System.out.println(ex.getMessage());
-    }
+	        	Response response = Response.newBuilder()
+	        		  .setMsg(String.valueOf(chunksReceived) + " Message received")
+			          .setMetaData(metadata)
+			          .setDatFragment(dataFragment)
+			          .build();
+	        	
+  			responseObserver.onNext(response);
+	        responseObserver.onCompleted();
+	        }
+	      };
     }
 }
