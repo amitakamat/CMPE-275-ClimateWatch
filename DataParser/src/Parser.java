@@ -34,7 +34,7 @@ public class Parser {
 					System.out.println(e.getMessage());
 				}
 			}
-			File file = new File("//mnt//e//mesowest.out");
+			File file = new File("//mnt//e//mesowest10.out");
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			StringBuffer stringBuffer = new StringBuffer();

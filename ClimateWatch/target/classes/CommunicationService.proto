@@ -1,6 +1,9 @@
 syntax = "proto3";
 
-package com.service.grpc;
+package grpcComm;
+option java_multiple_files = true;
+option java_package = "com.cmpe275.grpcComm";
+option java_outer_classname = "DataProto";
 
 option optimize_for = SPEED;
 
@@ -60,7 +63,7 @@ enum StatusCode {
 }
 
 service CommunicationService {
-  rpc PutHandler(stream Request) returns (Response);
-  rpc GetHandler(Request) returns (stream Response);
-  rpc Ping(Request) returns (Response);
+  rpc putHandler(stream Request) returns (Response);
+  rpc getHandler(Request) returns (stream Response);
+  rpc ping(Request) returns (Response);
 }

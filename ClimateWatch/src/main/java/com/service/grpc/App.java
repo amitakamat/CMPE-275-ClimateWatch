@@ -16,22 +16,22 @@ public class App
 	
 	private void start() throws IOException {
 	    /* The port on which the server should run */
-	    int grpcport = 9000;
-	    int httpport = 8000;
-	    //server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
+	    int grpcport = 8080;
+	   // int httpport = 8000;
+	   // server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
 	    
 	    server = ServerBuilder.forPort(grpcport)
 	        	.addService(new CommunicationServiceImpl())
 	        	.build();
 	    server.start();
 	     
-	    HttpServer httpserver = HttpServer.create(new InetSocketAddress(httpport), 0);
+	    /*HttpServer httpserver = HttpServer.create(new InetSocketAddress(httpport), 0);
 	    httpserver.createContext("/v1/getbydate", new DataHandler());
 	    httpserver.setExecutor(null); 
-	    httpserver.start();
+	    httpserver.start();*/
 	    
 	    logger.info("GRPC Server started, listening on " + grpcport);
-	    logger.info("GRPC Server started, listening on " + httpport);
+	   // logger.info("GRPC Server started, listening on " + httpport);
 	    
 	    Runtime.getRuntime().addShutdownHook(new Thread() {
 	      @Override

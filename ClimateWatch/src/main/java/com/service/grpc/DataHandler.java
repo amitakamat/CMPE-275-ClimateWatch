@@ -3,6 +3,8 @@ package com.service.grpc;
 import io.grpc.stub.StreamObserver;
 import io.grpc.*;
 import com.google.protobuf.ByteString;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 // TODO: should create new class to handle db and remove all these import
 
@@ -12,7 +14,9 @@ import com.sun.net.httpserver.HttpHandler;
 
 import org.bson.Document;
 import java.util.Date;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +58,7 @@ public class DataHandler implements HttpHandler {
 	    				temp = param[1];
 	    			}
 	    		}
-				
+				System.out.println(fromTime);
 				responseData = new MongoHandler().queryDB(fromTime, toTime, station, temp);
     	System.out.println("Rest Request Received");
     	//String responseString = "Rest Request Received";
@@ -73,12 +77,41 @@ public class DataHandler implements HttpHandler {
 
         //os.write(String.valueOf(responseData).getBytes());
         os.close();
+        
+        getClusterLeaders();
     	}
     	catch(Exception ex) {
     		System.out.println("Failed to retrive query parameters");
     		System.out.println(ex.getMessage());
     	}
     }
-    	
     
+    
+    private void getClusterLeaders() throws Exception {
+    	String url = "https://cmpe275-spring-18.mybluemix.net/get";
+		
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		// optional default is GET
+		con.setRequestMethod("GET");
+		
+		int responseCode = con.getResponseCode();
+		System.out.println("\nSending 'GET' request to URL : " + url);
+		System.out.println("Response Code : " + responseCode);
+
+		BufferedReader in = new BufferedReader(
+		        new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		in.close();
+
+		//print result
+		System.out.println(response.toString());
+
+    }
 }
