@@ -1,9 +1,8 @@
 package com.entrypoint.socket;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -197,7 +196,12 @@ public class PC extends Node{
 	    	    	
 	    	    }
 	        	System.out.println("Leader is"+maxIP);
-	        	if(pc.ip.equals(maxIP)){
+                try {
+                    setLeaderAmongClusters(maxIP);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(pc.ip.equals(maxIP)){
 	        		pc.state=RState.Leader;
 	        		//pc.disperseData();
 	        		appServer=new App();
@@ -213,6 +217,62 @@ public class PC extends Node{
             	
 	        }
 	    }
+
+    private void setLeaderAmongClusters(String ip) throws Exception{
+        String url = "https://cmpe275-spring-18.mybluemix.net/put/";
+
+        url += ip;
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        // optional default is GET
+        con.setRequestMethod("GET");
+
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        //print result
+        System.out.println(response.toString());
+    }
+
+    private void deleteLeaderAmongClusters(String ip) throws Exception{
+        String url = "https://cmpe275-spring-18.mybluemix.net/delete/";
+
+        url += ip;
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        // optional default is GET
+        con.setRequestMethod("GET");
+
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        //print result
+        System.out.println(response.toString());
+    }
 	  
 	  public String addMessageTypeJSON(String content){
 			StringBuilder sb=new StringBuilder();
