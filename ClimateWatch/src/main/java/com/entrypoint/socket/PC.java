@@ -81,16 +81,16 @@ public class PC extends Node{
 		
 		Timer timer = new Timer();
 		//Scheduling elections in 30 sec
-		timer.schedule(new ElectionMonitor(this), 3*1000);
+		timer.schedule(new ElectionMonitor(this), 20*1000);
 		
 	    
 	}
 	
-	public static PC getInstance()
+	public static PC getInstance() throws Exception
 	{
 		if(instance==null)
 		{
-			instance = new PC(1,EntryPoint.getIP());
+			instance = new PC(1,"169.254.21.84");
 		}
 		return instance;
 		
@@ -152,12 +152,16 @@ public class PC extends Node{
 		  
 	        public void run() {
 	            if(state == RState.Leader)
-	            {
-//	            	checkHeartBeat();
+	            {	            	
+	            	//sendHeartBeat();
+	            	for(int i=0;i<otherNodes.size();i++){
+	            		pc.mc = new MessageClient(otherNodes.get(i%otherNodes.size()),4568);	
+	            		pc.mc.ping();
+	            	}
 	            }
 	            else
 	            {
-//	            	sendHeartBeat();
+//	            	//checkHeartBeat();
 	            }
 	        }
 	    }
@@ -218,6 +222,11 @@ public class PC extends Node{
 		public String addMessageTypePUTQUERY(String content){
 			StringBuilder sb=new StringBuilder();
 			sb.append("Type:PUTQUERY	").append(content);
+			return sb.toString();
+		}
+		public String addMessageTypeGETQUERY(String content){
+			StringBuilder sb=new StringBuilder();
+			sb.append("Type:GETQUERY ").append(content);
 			return sb.toString();
 		}
 
