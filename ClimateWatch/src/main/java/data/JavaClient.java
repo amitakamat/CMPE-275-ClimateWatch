@@ -16,7 +16,7 @@ public class JavaClient
 
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter task [get / put / ping]: ");
-        String task = scanner.next();
+        String task = scanner.nextLine();
 
 
         final ManagedChannel channel = ManagedChannelBuilder.forTarget("127.0.0.1:8080") //ManagedChannelBuilder.forTarget("169.254.79.93:8080")
@@ -44,11 +44,11 @@ public class JavaClient
 
                 break;
             case "get":
-            	String from_time = scanner.nextLine();
+
                 System.out.print("\nEnter from_time 'yyyy-MM-dd HH:mm:ss': ");
-                String to_time = scanner.nextLine();
+                String from_time = scanner.nextLine();
                 System.out.print("\nEnter to_time 'yyyy-MM-dd HH:mm:ss': ");
-                
+                String to_time = scanner.nextLine();
 
                 QueryParams queryParams = QueryParams.newBuilder()
                         .setFromUtc(from_time)
@@ -83,7 +83,7 @@ public class JavaClient
                 break;
             case "put":
                 System.out.print("Enter directory path: ");
-                String path = scanner.next();
+                String path = scanner.nextLine();
 
                 MesonetProcessor mesonetProcessor = new MesonetProcessor(channel, asyncStub);
 
