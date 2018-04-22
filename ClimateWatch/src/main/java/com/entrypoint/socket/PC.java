@@ -1,9 +1,8 @@
 package com.entrypoint.socket;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,8 +18,6 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.service.grpc.App;
-
-import data.ReadData;
 import gash.messaging.Message;
 import gash.messaging.Node;
 import gash.router.client.MessageClient;
@@ -86,12 +83,12 @@ public class PC extends Node{
 	    
 	}
 	
-	public static PC getInstance()
+	public static PC getInstance() throws Exception
 	{
 		if(instance==null)
 		{
-			//instance = new PC(1,EntryPoint.getIP());
-			instance = new PC(1,"169.254.198.56");
+			instance = new PC(1,EntryPoint.getIP());
+			//instance = new PC(1,"localhost");
 		}
 		return instance;
 		
@@ -114,8 +111,8 @@ public class PC extends Node{
 	
 	public void disperseData(){
 		if(state == RState.Leader){
-			ReadData readData = new ReadData();
-			readData.getFile(mc,otherNodes);
+			//ReadData readData = new ReadData();
+			//readData.getFile(mc,otherNodes);
 		}
 		
 	}
@@ -153,12 +150,16 @@ public class PC extends Node{
 		  
 	        public void run() {
 	            if(state == RState.Leader)
-	            {
-//	            	checkHeartBeat();
+	            {	            	
+	            	//sendHeartBeat();
+	            	for(int i=0;i<otherNodes.size();i++){
+	            		pc.mc = new MessageClient(otherNodes.get(i%otherNodes.size()),4568);	
+	            		pc.mc.ping();
+	            	}
 	            }
 	            else
 	            {
-//	            	sendHeartBeat();
+//	            	//checkHeartBeat();
 	            }
 	        }
 	    }
@@ -194,7 +195,12 @@ public class PC extends Node{
 	    	    	
 	    	    }
 	        	System.out.println("Leader is"+maxIP);
-	        	if(pc.ip.equals(maxIP)){
+                try {
+                    setLeaderAmongClusters(maxIP);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(pc.ip.equals(maxIP)){
 	        		pc.state=RState.Leader;
 	        		//pc.disperseData();
 	        		appServer=new App();
@@ -210,6 +216,62 @@ public class PC extends Node{
             	
 	        }
 	    }
+
+    private void setLeaderAmongClusters(String ip) throws Exception{
+        String url = "https://cmpe275-spring-18.mybluemix.net/put/";
+
+        url += ip;
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        // optional default is GET
+        con.setRequestMethod("GET");
+
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        //print result
+        System.out.println(response.toString());
+    }
+
+    private void deleteLeaderAmongClusters(String ip) throws Exception{
+        String url = "https://cmpe275-spring-18.mybluemix.net/delete/";
+
+        url += ip;
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        // optional default is GET
+        con.setRequestMethod("GET");
+
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        //print result
+        System.out.println(response.toString());
+    }
 	  
 	  public String addMessageTypeJSON(String content){
 			StringBuilder sb=new StringBuilder();
@@ -221,10 +283,15 @@ public class PC extends Node{
 			sb.append("Type:PUTQUERY	").append(content);
 			return sb.toString();
 		}
+		public String addMessageTypeGETQUERY(String content){
+			StringBuilder sb=new StringBuilder();
+			sb.append("Type:GETQUERY ").append(content);
+			return sb.toString();
+		}
 
 		
 	  public void parseMesowest() {
-		   String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
+		   String[] headers = {"station", "WeatherDate", "MNET", "latitude", "longitude", "elevation", "temperature", "SKNT", "DRCT", "GUST", "PMSL", "altitude", "DWPF", "RELH", "WTHR", "P24I"};
 			 MongoClient mongoClient = null;
 			 DBCollection dbCollection = null; 
 			try {

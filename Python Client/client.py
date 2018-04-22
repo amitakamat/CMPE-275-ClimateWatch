@@ -65,19 +65,35 @@ def parse_and_push_files(path, clientobj):
                 totalLines = len(lines)
                 for i in range(4, len(lines)):
                     if len(lines[i]) != 0:
-                        requestPayload+=lines[i]
-                        chunkSize+=1
+                        requestPayload += format_data(lines[i]) + '\n'
+                        chunkSize += 1
                         if chunkSize == maxChunkSize or i == len(lines)-1:
                             chunkSize = 0;
-                            iterator = clientobj.stream_putreq(recordlist=requestPayload)
-                            resp = clientobj.stub.putHandler(iterator)
-                            print(resp.msg)
+                            #iterator = clientobj.stream_putreq(recordlist=requestPayload)
+                            #resp = clientobj.stub.putHandler(iterator)
+                            #print(resp.msg)
                             print(requestPayload)
-                            requestPayload = "";
+                            requestPayload = ""
                             chunksProcessed += 1
         print("Total lines :" + str(totalLines))
         print("Total chunks :" + str(chunksProcessed))
 
+
+def format_data(line):
+    cols = line.split()
+    timestamp_utc = format_timestamp(cols[1])
+    return ",".join(cols[:1] + [timestamp_utc] + cols[2:])
+
+
+def format_timestamp(timestamp):
+    tuples = timestamp.split('/')
+    year = tuples[0][:4]
+    month = tuples[0][4:6]
+    day = tuples[0][6:8]
+    hour = tuples[1][:2]
+    minute = tuples[1][2:4]
+
+    return '%s-%s-%s %s:%s:00' % (year, month, day, hour, minute)
 
 
 

@@ -3,8 +3,10 @@ package com.service.grpc;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
+import com.google.gson.JsonObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
@@ -12,6 +14,9 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import org.bson.json.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MongoHandler {
 	protected static MongoClient mongoClient;
@@ -38,18 +43,21 @@ public class MongoHandler {
 	 * @param from, to
 	 *            The message request parameters received
 	 */
-	public List<DBObject> queryDB(Date fromTime, Date toTime, String station, String temp) {
+	public List<DBObject> queryDB(Date fromTime, Date toTime, String parameters) {
 		List<DBObject> records = new ArrayList<>();
 		try {
 		System.out.println(fromTime);
 		System.out.println(toTime);
 		BasicDBObject query = new BasicDBObject();
 		query.put("WeatherDate", BasicDBObjectBuilder.start("$gte", fromTime).add("$lte", toTime).get());
-		if(station != "") {
-			query.put("STN", station);
-		}
-		if(temp != "") {
-			query.put("TMPF", temp);
+		if(parameters.length() != 0) {
+			JSONArray jsonarray = new JSONArray(parameters);
+			for (int i = 0; i < jsonarray.length(); i++) {
+			    JSONObject jsonobject = jsonarray.getJSONObject(i);
+			    String op = "$" + jsonobject.getString("op");
+			    query.put(jsonobject.getString("lhs"), new BasicDBObject(op, jsonobject.getString("rhs")));
+			}
+			
 		}
 		//BasicDBObject query = new BasicDBObject("WeatherDate", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
 		DBCursor cursor = dbCollection.find(query);
@@ -62,6 +70,17 @@ public class MongoHandler {
 			System.out.println(ex.getMessage());
 		}
 		return records;
+	}
+	
+	public static void main(String[] args) {
+		try {
+			Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2018-03-21 01:00:00");
+			Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2018-03-21 22:20:00");
+			new MongoHandler().queryDB(fromTime, toTime, "[{'lhs': 'station', 'op': 'eq', 'rhs': 'CRN'}, {'lhs': 'temperature', 'op': 'eq', 'rhs': '38.35'}]");
+		}
+		catch(Exception ex) {
+			System.out.println(ex.getMessage());
+		}
 	}
 
 }

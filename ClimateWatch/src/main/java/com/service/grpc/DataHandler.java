@@ -59,7 +59,7 @@ public class DataHandler implements HttpHandler {
 	    			}
 	    		}
 				System.out.println(fromTime);
-				responseData = new MongoHandler().queryDB(fromTime, toTime, station, temp);
+				//responseData = new MongoHandler().queryDB(fromTime, toTime, station, temp);
     	System.out.println("Rest Request Received");
     	//String responseString = "Rest Request Received";
         OutputStream os = t.getResponseBody();

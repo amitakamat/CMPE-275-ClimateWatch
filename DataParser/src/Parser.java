@@ -13,11 +13,11 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.lambdaworks.redis.*;
+//import com.lambdaworks.redis.*;
 import redis.clients.jedis.Jedis;
 
 public class Parser {
-	static String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
+	static String[] headers = {"station", "WeatherDate", "MNET", "latitude", "longitude", "elevation", "temperature", "SKNT", "DRCT", "GUST", "PMSL", "altitude", "DWPF", "RELH", "WTHR", "P24I"};
 	protected static MongoClient mongoClient;
 	protected static DBCollection dbCollection; 
 	
@@ -34,7 +34,7 @@ public class Parser {
 					System.out.println(e.getMessage());
 				}
 			}
-			File file = new File("//mnt//e//mesowest10.out");
+			File file = new File("//mnt//e//mesowest.out");
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			StringBuffer stringBuffer = new StringBuffer();
@@ -81,7 +81,8 @@ public class Parser {
 		}
 	}
 	public static void main(String[] args) {
-		Jedis jedis = new Jedis("redis-11146.c11.us-east-1-2.ec2.cloud.redislabs.com", 11146);
+		new Parser().parseMesowest();
+		/*Jedis jedis = new Jedis("redis-11146.c11.us-east-1-2.ec2.cloud.redislabs.com", 11146);
 	    jedis.auth("CMPE295");
 	    UUID uuid = UUID.randomUUID();
 	    jedis.hset("IP-Map", String.valueOf(uuid), "192.168.25.300");
@@ -89,7 +90,7 @@ public class Parser {
 	    Map<String, String> records = jedis.hgetAll("IP-Map");
 	    for(Map.Entry<String,String> entry : records.entrySet()){
 	    	System.out.println(String.format("%s : %s", entry.getKey(), entry.getValue()));
-	    }
+	    }*/
 	    
 	    /** To delete the entire hashmap 
 	         jedis.del("IP-Map");

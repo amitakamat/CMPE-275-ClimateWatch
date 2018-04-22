@@ -31,6 +31,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.service.grpc.MongoHandler;
 
 import gash.messaging.Message;
 import gash.messaging.Node;
@@ -110,6 +111,30 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 			System.out.println(ex.getMessage());
 		}
 	}
+	
+	public String queryDB1(String payload) {
+		String[] filters = payload.split("and");
+		MongoHandler h=new MongoHandler();
+		String resp="";
+		//h.queryDB(fromTime, toTime, station, temp)
+		try {
+			Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(filters[0]);
+			Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(filters[1]);
+			
+			BasicDBObject query = new BasicDBObject("time", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
+			DBCursor cursor = dbCollection.find(query);
+			while(cursor.hasNext()) {
+		        //System.out.println(cursor.next());
+		        resp += String.valueOf(cursor.next())+" \n";
+		    }
+			
+			}
+			catch(Exception ex) {
+				System.out.println(ex.getMessage());
+			}
+		System.out.println(resp);
+		return resp;
+	}
 	public void writeToDB(String split){
     	String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
 		 //MongoClient mongoClient = null;
@@ -163,8 +188,8 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 					}
 				}
 				dbCollection.insert(messageObject);
-				System.out.println(line);
-				stringBuffer.append("\n\n\n");
+				//System.out.println(line);
+				//stringBuffer.append("\n\n\n");
 			}
 			count++;
 		}
@@ -191,8 +216,9 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         	writeToDB(splitMesg[1]);
         }
         if(splitMesg[0].contains("GETQUERY")){
+        	System.out.println(splitMesg[1].substring(0, splitMesg[1].length()-1));
 
-        	//queryToDB(splitMesg[1]);
+        	queryDB1(splitMesg[1].substring(0, splitMesg[1].length()-1));
         }
         if(splitMesg[0].contains("ping")){
 

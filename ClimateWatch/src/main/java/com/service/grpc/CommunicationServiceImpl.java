@@ -77,7 +77,12 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	   	   try {  
 			   	Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getFromUtc());
 				Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getToUtc());
-				List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, "", "");
+				List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, params.getParamsJson());
+				
+				for(int i=0;i<localnodes.size();i++){	
+	        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
+	        		pc.mc.postMessage(pc.addMessageTypeGETQUERY(params.getFromUtc()+"and"+params.getToUtc()));
+	        	}
 		   	   
 		   	   if (!responseData.isEmpty()) {
 		   		responseMsg = "Data present";
