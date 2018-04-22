@@ -11,6 +11,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.awt.*;
 import java.io.File;
 import java.io.FileFilter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -69,6 +70,7 @@ public class MesonetProcessor
         String name = dataSource.getName().substring(0, dataSource.getName().lastIndexOf("."));
         ;
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd_HHmm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd/HHmm");
         DateTime dt = formatter.parseDateTime(name);
 
         // filters
@@ -135,10 +137,9 @@ public class MesonetProcessor
                 requestObs = asyncStub.putHandler(responseObserver);
 
                 for (MesonetData d : data) {
-                    // TODO do something other than print!
-                    String line = "Date: " + dt.toString() + ", Obs: " + d.getStationID() + " T = " + d.getTemperature() + ", WS = "
-                            + d.getWindSpeed() + ", WD = " + d.getWindDir() + ", RH = " + d.getRelHumidity() + "\n";
-                    System.out.println(line);
+                    String line = d.getStationID() + "," + simpleDateFormat.format(d.getTimeObsAsDate()) + "," + d.getDataProvider() + "," + d.getLatitude() + "," + d.getLongitude() + "," + d.getElevation() + "," + d.getTemperature() + "," + d.getWindSpeed() + "," + d.getWindDir() + "," + d.getWindGust() + "," + d.getSeaLevelPress() + "," + d.getAltimeter() + "," + d.getDewpoint() + "," + d.getRelHumidity() + ",-9999.00,-9999.00\n";
+
+//                    System.out.print(line);
 
                     chunkSize++;
                     requestPayload.append(line);
@@ -190,7 +191,7 @@ public class MesonetProcessor
 
             }
 
-            if (chunkSize != 0){
+            if (chunkSize != 0) {
                 chunkSize = 0;
 
                 //send data
