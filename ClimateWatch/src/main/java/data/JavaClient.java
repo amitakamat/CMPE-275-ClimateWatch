@@ -19,7 +19,7 @@ public class JavaClient
         String task = scanner.next();
 
 
-        final ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:8080") //ManagedChannelBuilder.forTarget("169.254.79.93:8080")
+        final ManagedChannel channel = ManagedChannelBuilder.forTarget("127.0.0.1:8080") //ManagedChannelBuilder.forTarget("169.254.79.93:8080")
                 .usePlaintext(true)
                 .build();
         CommunicationServiceGrpc.CommunicationServiceBlockingStub stub = CommunicationServiceGrpc.newBlockingStub(channel);
@@ -44,11 +44,11 @@ public class JavaClient
 
                 break;
             case "get":
-
+            	String from_time = scanner.nextLine();
                 System.out.print("\nEnter from_time 'yyyy-MM-dd HH:mm:ss': ");
-                String from_time = scanner.next();
+                String to_time = scanner.nextLine();
                 System.out.print("\nEnter to_time 'yyyy-MM-dd HH:mm:ss': ");
-                String to_time = scanner.next();
+                
 
                 QueryParams queryParams = QueryParams.newBuilder()
                         .setFromUtc(from_time)

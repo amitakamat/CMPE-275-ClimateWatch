@@ -20,12 +20,14 @@ import com.mongodb.MongoClient;
 import com.service.grpc.App;
 import gash.messaging.Message;
 import gash.messaging.Node;
+import gash.router.client.CommListener;
 import gash.router.client.MessageClient;
 import gash.router.server.MessageServer;
 import redis.clients.jedis.Jedis;
+import routing.Pipe.Route;
 
 
-public class PC extends Node{
+public class PC extends Node implements CommListener{
 	
 
 	String LeaderNodeIP = null;
@@ -37,6 +39,8 @@ public class PC extends Node{
 	public MessageServer ms ;
 	
 	public App appServer;
+	
+	public List<String> qList;
 	
 	
 	public static PC instance = null;
@@ -68,6 +72,8 @@ public class PC extends Node{
 	    File cf=new File("resources/routing.conf");
 		this.ms=new MessageServer(cf,this);
 		
+		this.qList=new ArrayList<String>();
+		
 		Runnable startServerThread = new StartServerThread(this.ms);
 		new Thread(startServerThread).start();
 		
@@ -93,7 +99,21 @@ public class PC extends Node{
 		return instance;
 		
 	}
+	
+	@Override
+	       public String getListenerID() {
+	               return "demo";
+			}
 
+	@Override
+	       public void onMessage(Route msg) {
+	               //System.out.println("Final PC recieved ---> " + msg.getPayload());
+	               
+	               qList.add(msg.getPayload());
+	               /*return new StreamObserver<Request>() {
+	               }*/
+	
+	       }
 	public void initDB() {
 		jedis = new Jedis("redis-11146.c11.us-east-1-2.ec2.cloud.redislabs.com", 11146);
 	    jedis.auth("CMPE295");  
@@ -280,7 +300,7 @@ public class PC extends Node{
 		}
 		public String addMessageTypePUTQUERY(String content){
 			StringBuilder sb=new StringBuilder();
-			sb.append("Type:PUTQUERY	").append(content);
+			sb.append("Type:PUTQUERY ").append(content);
 			return sb.toString();
 		}
 		public String addMessageTypeGETQUERY(String content){

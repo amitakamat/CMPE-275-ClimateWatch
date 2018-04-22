@@ -28,6 +28,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import com.entrypoint.socket.PC;
 
 public class CommunicationServiceImpl extends CommunicationServiceGrpc.CommunicationServiceImplBase {   
@@ -77,14 +79,42 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	   	   try {  
 			   	Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getFromUtc());
 				Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getToUtc());
-				List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, params.getParamsJson());
+				//List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, params.getParamsJson());
 				
 				for(int i=0;i<localnodes.size();i++){	
 	        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
+	        		pc.mc.addListener(pc);
 	        		pc.mc.postMessage(pc.addMessageTypeGETQUERY(params.getFromUtc()+"and"+params.getToUtc()));
 	        	}
+				TimeUnit.SECONDS.sleep(10);
+				                              
+				while(pc.qList.size()!=0){
+					System.out.println("removing and sending out last mesg");
+					//System.out.println();
+              
+					responseMsg = pc.qList.remove(0);          
+                        
+					MetaData metadata = MetaData.newBuilder()
+                                       .setUuid("")
+                                                    .setNumOfFragment(1)
+				                                                         .setMediaType(3)
+				                                                         .build();
+				                                     
+				                                     DatFragment dataFragment = DatFragment.newBuilder()
+				                                                                 .setData(ByteString.copyFromUtf8(""))
+				                                                                 .build();
+				                               
+				                                     Response response = Response.newBuilder()
+				                                                 .setMsg(responseMsg)
+				                                                 .setMetaData(metadata)
+				                                                 .setDatFragment(dataFragment)
+				                                                 .build();
+				                               
+				                                     responseObserver.onNext(response);
+				                                     responseObserver.onCompleted();
+				                               }
 		   	   
-		   	   if (!responseData.isEmpty()) {
+		   	  /* if (!responseData.isEmpty()) {
 		   		responseMsg = "Data present";
 		   		   int fragment = 1;
 		   		   int chunkSize = 0;
@@ -149,7 +179,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 			
 			      responseObserver.onNext(response);
 			      responseObserver.onCompleted();
-		   	   } 
+		   	   } */
 		   	System.out.println(new DataHandler().getClusterLeaders());
 	    }
 	    catch(Exception ex) {

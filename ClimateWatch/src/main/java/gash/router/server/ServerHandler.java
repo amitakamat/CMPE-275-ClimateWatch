@@ -47,6 +47,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 import routing.Pipe.Route;
 
+import java.util.List;
+import com.mongodb.BasicDBObjectBuilder;
+
 /**
  * The message handler processes json messages that are delimited by a 'newline'
  * 
@@ -93,26 +96,9 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 	 * @param payload
 	 *            The message payload received
 	 */
-	public void queryDB(String payload) {
-		// Assuming we get from and to date in a single message divided by ',' 
-		String[] filters = payload.split(",");
-		try {
-		Date fromTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(filters[0]);
-		Date toTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(filters[1]);
-		
-		BasicDBObject query = new BasicDBObject("time", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
-		DBCursor cursor = dbCollection.find(query);
-		while(cursor.hasNext()) {
-	        System.out.println(cursor.next());
-	    }
-		
-		}
-		catch(Exception ex) {
-			System.out.println(ex.getMessage());
-		}
-	}
+
 	
-	public String queryDB1(String payload) {
+	public String queryDB1(String payload, ChannelHandlerContext ctx) {
 		String[] filters = payload.split("and");
 		MongoHandler h=new MongoHandler();
 		String resp="";
@@ -121,12 +107,22 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 			Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(filters[0]);
 			Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(filters[1]);
 			
-			BasicDBObject query = new BasicDBObject("time", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
+			/*BasicDBObject query = new BasicDBObject("time", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
 			DBCursor cursor = dbCollection.find(query);
 			while(cursor.hasNext()) {
 		        //System.out.println(cursor.next());
 		        resp += String.valueOf(cursor.next())+" \n";
-		    }
+		    }*/
+			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, ", ");
+			for (int i = 0; i < responseData.size(); i++) {
+				                               //System.out.println(responseData.get(i).toString());
+				                               //ctx.writeAndFlush("SERVERRESPONSE");
+				                               Route.Builder rb = Route.newBuilder();
+				                       rb.setId(10);
+				                       rb.setPath("/message");
+				                       rb.setPayload("SERVERRESPONSE"+responseData.get(i).toString());
+				                   ctx.writeAndFlush(rb.build());
+				}
 			
 			}
 			catch(Exception ex) {
@@ -164,7 +160,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 			if(line.length()!=0 && count>3) {
 				stringBuffer.append(line);
 				System.out.println("\n");
-				String[] lineArray = line.split(" ");
+				String[] lineArray = line.split(",");
 				int size = 0;
 				int j = 0;
 				String uniqueID = UUID.randomUUID().toString();					
@@ -218,7 +214,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         if(splitMesg[0].contains("GETQUERY")){
         	System.out.println(splitMesg[1].substring(0, splitMesg[1].length()-1));
 
-        	queryDB1(splitMesg[1].substring(0, splitMesg[1].length()-1));
+        	queryDB1(splitMesg[1].substring(0, splitMesg[1].length()-1),ctx);
         }
         if(splitMesg[0].contains("ping")){
 

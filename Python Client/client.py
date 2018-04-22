@@ -13,7 +13,7 @@ import uuid
 
 
 class client(object):
-    def __init__(self, host='169.254.21.84', port=8080):
+    def __init__(self, host='127.0.0.1', port=8080):
         channel = grpc.insecure_channel('%s:%d' % (host, port))
         self.stub = data_pb2_grpc.CommunicationServiceStub(channel)
         if self.stub is not None:
@@ -69,9 +69,9 @@ def parse_and_push_files(path, clientobj):
                         chunkSize += 1
                         if chunkSize == maxChunkSize or i == len(lines)-1:
                             chunkSize = 0;
-                            #iterator = clientobj.stream_putreq(recordlist=requestPayload)
-                            #resp = clientobj.stub.putHandler(iterator)
-                            #print(resp.msg)
+                            iterator = clientobj.stream_putreq(recordlist=requestPayload)
+                            resp = clientobj.stub.putHandler(iterator)
+                            print(resp.msg)
                             print(requestPayload)
                             requestPayload = ""
                             chunksProcessed += 1
