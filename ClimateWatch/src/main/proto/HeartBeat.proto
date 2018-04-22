@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option optimize_for = SPEED;
+option java_package = "heartbeat";
+
+
+
+service HeartBeatService {
+  rpc HeartBeat(Request) returns (Response);
+}
+
+message Response {
+  StatusCode Code = 1; // PingRequest will only use this field if succeeded
+}
+
+enum StatusCode {
+  Unknown = 0;
+  Ok = 1;
+  Failed = 2;
+}
+
+message Request {
+ 	int64 beat = 1;
+}

@@ -72,11 +72,17 @@ public class PC extends Node
         Timer timer = new Timer();
         //Scheduling elections in 30 sec
         timer.schedule(new ElectionMonitor(this), 30 * 1000);
+        
+        
+
+        //Start HeartBeatService for everyone
+        
+       
 
 
     }
 
-    public static PC getInstance()
+    public static synchronized PC getInstance()
     {
         if (instance == null) {
             instance = new PC(1, EntryPoint.getIP());
@@ -354,5 +360,7 @@ public class PC extends Node
             svr.startServer();
         }
     }
+    
+   
 
 }
