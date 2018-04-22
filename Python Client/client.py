@@ -13,7 +13,7 @@ import uuid
 
 
 class client(object):
-    def __init__(self, host='127.0.0.1', port=8080):
+    def __init__(self, host='169.254.21.84', port=8080):
         channel = grpc.insecure_channel('%s:%d' % (host, port))
         self.stub = data_pb2_grpc.CommunicationServiceStub(channel)
         if self.stub is not None:
@@ -94,7 +94,7 @@ def main():
         if sys.argv[1] == "get":
 
             # TODO: Validate input time format
-            print("Enter from_time 'yyyy-MM-dd HH:mm:ss') :")
+            print("Enter from_time ('yyyy-MM-dd HH:mm:ss') :")
             frm = str(input())
             print("Enter to_time ('yyyy-MM-dd HH:mm:ss') :")
             to = str(input())

@@ -33,7 +33,7 @@ public class PC extends Node{
 
 	String LeaderNodeIP = null;
 	boolean isLeader = false;
-	String ip = null;
+	public String ip = null;
 	public List<String> otherNodes = new ArrayList<String>();
 	
 	public MessageClient mc ;
@@ -81,7 +81,7 @@ public class PC extends Node{
 		
 		Timer timer = new Timer();
 		//Scheduling elections in 30 sec
-		timer.schedule(new ElectionMonitor(this), 3*1000);
+		timer.schedule(new ElectionMonitor(this), 20*1000);
 		
 	    
 	}
@@ -90,7 +90,8 @@ public class PC extends Node{
 	{
 		if(instance==null)
 		{
-			instance = new PC(1,EntryPoint.getIP());
+			//instance = new PC(1,EntryPoint.getIP());
+			instance = new PC(1,"169.254.198.56");
 		}
 		return instance;
 		

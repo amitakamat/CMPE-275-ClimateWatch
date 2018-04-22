@@ -12,6 +12,7 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.QueryBuilder;
 import com.mongodb.client.MongoCursor;
+import com.service.grpc.MongoHandler;
 
 import gash.router.client.MessageClient;
 
@@ -144,6 +145,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 			      responseObserver.onNext(response);
 			      responseObserver.onCompleted();
 		   	   } 
+		   	System.out.println(new DataHandler().getClusterLeaders());
 	    }
 	    catch(Exception ex) {
 	    	System.out.println(ex.getMessage());
@@ -158,6 +160,28 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	    File f = new File("//mnt//c//");
 	    System.out.println("Printing the total space");
 	    System.out.println(f.getTotalSpace()/1000000.00 +" Megabytes");
+//	    ArrayList<String> clusterLeaders = new ArrayList<String>();
+//    	clusterLeaders.add("169.254.204.172");
+//    	//System.out.println("My IP : " + pc.ip);
+//    	System.out.println(clusterLeaders);
+//    	try {
+//	    	/*ArrayList<String> clusterLeaders = new DataHandler().getClusterLeaders();*/
+//	    	//for(int i=0; i<clusterLeaders.size(); i++) {
+//	    		//if(!clusterLeaders.get(i).equals(pc.ip)){
+//	    			//System.out.println("My IP : " + pc.ip);
+//	    			ClusterClient c = new ClusterClient(clusterLeaders.get(0));
+//	    			//c.putRequest(request);
+//	    			Response r = c.ping();
+//	    			System.out.println(r.getMsg());
+//	    			Thread.sleep(500);
+//	    			c.channelShutDown();
+//	    			//break;
+//	    		//}
+//	    	//}
+//    	} catch(Exception ex) {
+//    		System.out.println(ex.getMessage());
+//    	}
+	    
 	    
 	    return new StreamObserver<Request>() {
 		    int chunksReceived = 0;
@@ -172,6 +196,24 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		        		
 		        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
 		        	}
+		        	
+		        	// TODO: Test this functionality
+		        	/* If space not available on any node in the cluster*/
+		        	//ArrayList<String> clusterLeaders = new ArrayList<String>();
+//		        	clusterLeaders.add("169.254.204.172");
+		        	ArrayList<String> clusterLeaders = new DataHandler().getClusterLeaders();
+//		        	for(int i=0; i<clusterLeaders.size(); i++) {
+//		        		//if(!clusterLeaders.get(i).equals(pc.ip)){
+//		        			//System.out.println("My IP : " + pc.ip);
+//		        			ClusterClient c = new ClusterClient(clusterLeaders.get(i));
+//		        			c.putRequest(request);
+//		        			//Response r = c.ping();
+//		        			//System.out.println(r.getMsg());
+//		        			Thread.sleep(500);
+//		        			c.channelShutDown();
+//		        			break;
+//		        		//}
+//		        	}
 		    	    System.out.println("Received request : "+ receivedMessage);
 		    	    chunksReceived++;
 		    	    

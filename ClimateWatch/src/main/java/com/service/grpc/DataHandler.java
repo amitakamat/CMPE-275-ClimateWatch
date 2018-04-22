@@ -1,5 +1,5 @@
 package com.service.grpc;
-
+import java.util.ArrayList;
 import io.grpc.stub.StreamObserver;
 import io.grpc.*;
 import com.google.protobuf.ByteString;
@@ -87,9 +87,9 @@ public class DataHandler implements HttpHandler {
     }
     
     
-    private void getClusterLeaders() throws Exception {
+    public ArrayList<String> getClusterLeaders() throws Exception {
     	String url = "https://cmpe275-spring-18.mybluemix.net/get";
-		
+		ArrayList<String> clusterLeaders = new ArrayList<String>();
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -107,11 +107,13 @@ public class DataHandler implements HttpHandler {
 
 		while ((inputLine = in.readLine()) != null) {
 			response.append(inputLine);
+			clusterLeaders.add(inputLine);
 		}
 		in.close();
 
 		//print result
 		System.out.println(response.toString());
+		return clusterLeaders;
 
     }
 }
