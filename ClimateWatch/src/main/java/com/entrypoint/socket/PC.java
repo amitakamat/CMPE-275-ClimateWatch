@@ -41,6 +41,7 @@ public class PC extends Node implements CommListener{
 	public App appServer;
 	
 	public List<String> qList;
+	public List<String> qList_space;
 	
 	
 	public static PC instance = null;
@@ -73,6 +74,7 @@ public class PC extends Node implements CommListener{
 		this.ms=new MessageServer(cf,this);
 		
 		this.qList=new ArrayList<String>();
+		this.qList_space=new ArrayList<String>();
 		
 		Runnable startServerThread = new StartServerThread(this.ms);
 		new Thread(startServerThread).start();
@@ -108,10 +110,10 @@ public class PC extends Node implements CommListener{
 	@Override
 	       public void onMessage(Route msg) {
 	               //System.out.println("Final PC recieved ---> " + msg.getPayload());
-	               
-	               qList.add(msg.getPayload());
-	               /*return new StreamObserver<Request>() {
-	               }*/
+	               if(msg.getPayload().contains("SERVERRESPONSE"))
+	            	   qList.add(msg.getPayload());
+	               if(msg.getPayload().contains("SPACECHECK"))
+	            	   qList_space.add(msg.getPayload());
 	
 	       }
 	public void initDB() {

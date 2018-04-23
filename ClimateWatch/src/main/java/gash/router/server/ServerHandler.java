@@ -202,7 +202,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 	    Route.Builder rb = Route.newBuilder();
         rb.setId(10);
         rb.setPath("/message");
-        rb.setPayload("SERVERRESPONSE:"+ result);
+        rb.setPayload("SPACECHECK:"+ result);
     ctx.writeAndFlush(rb.build());
 	}
 	

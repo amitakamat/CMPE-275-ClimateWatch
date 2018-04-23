@@ -297,14 +297,14 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		        	System.out.println(localnodes.size());
 	        		pc.mc = new MessageClient(localnodes.get(nodeNo%localnodes.size()),4568);
 	        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
-		        		/*TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
-						if(pc.qList.size()!=0){
+		        		TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
+						if(pc.qList_space.size()!=0){
 							//TimeUnit.SECONDS.sleep(2);
 							System.out.println("get response for space");
 							//responseMsg = pc.qList.remove(0);   
 							System.out.println(pc.qList.remove(0));	
 						}
-						*/
+						
 	        		// If has space
 	        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
 	        		nodeNo++;
