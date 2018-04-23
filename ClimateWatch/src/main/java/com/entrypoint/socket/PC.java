@@ -176,7 +176,7 @@ public class PC extends Node implements CommListener {
 			}
 
 			timer = new Timer();
-			timer.schedule(new HeartBeatTask(this), 1, 40 * 1000);
+			timer.schedule(new HeartBeatTask(this), 60 * 1000, 60 * 1000);
 
 			// pc.disperseData();
 
