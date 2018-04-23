@@ -114,7 +114,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		        //System.out.println(cursor.next());
 		        resp += String.valueOf(cursor.next())+" \n";
 		    }*/
-			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, ", ");
+			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, "");
 			for (int i = 0; i < responseData.size(); i++) {
 				                               //System.out.println(responseData.get(i).toString());
 				                               //ctx.writeAndFlush("SERVERRESPONSE");
@@ -155,7 +155,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
     	String line;
     	StringBuffer stringBuffer = new StringBuffer();
     	
-    	while(entries[lineNo]!=null){
+    	while(/*entries[lineNo]!=null*/lineNo<10){
     		line=entries[lineNo];
 			if(line.length()!=0) {
 				stringBuffer.append(line);
@@ -206,15 +206,15 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		//Route.Builder rb = Route.newBuilder();
 	      // ((Route.Builder)msg).getPayload();
 		String recvdMesg=msg.toString();//((Route.Builder)msg).getPayload();
-        System.out.println(
-            "Server received: " + recvdMesg);
+      //  System.out.println(
+        //    "Server received: " + recvdMesg);
         
         recvdMesg=recvdMesg.split("payload: \"")[1].toString();
-        System.out.println("String is below");
-        System.out.println(recvdMesg);
+       // System.out.println("String is below");
+       // System.out.println(recvdMesg);
         
         String[] splitMesg=recvdMesg.split(" ",2);
-        System.out.println(splitMesg[0]+"yay");
+        //System.out.println(splitMesg[0]+"yay");
 
         if(splitMesg[0].contains("PUTQUERY")){
 

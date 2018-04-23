@@ -38,6 +38,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	static int maxChunkSize = 10;
 	private List<String> localnodes;
 	private PC pc;
+	private int nodeNo;
 	
 	public CommunicationServiceImpl(){
 		
@@ -45,6 +46,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	public CommunicationServiceImpl(PC pc){
 		this.pc=pc;
 		this.localnodes=pc.otherNodes;
+		this.nodeNo=0;
 		
 	}
 	
@@ -85,33 +87,28 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	        		pc.mc.addListener(pc);
 	        		pc.mc.postMessage(pc.addMessageTypeGETQUERY(params.getFromUtc()+"and"+params.getToUtc()));
 	        	}
-				TimeUnit.SECONDS.sleep(10);
-				                              
-				while(pc.qList.size()!=0){
-					System.out.println("removing and sending out last mesg");
-					//System.out.println();
-              
-					responseMsg = pc.qList.remove(0);          
-                        
-					MetaData metadata = MetaData.newBuilder()
-                                       .setUuid("")
-                                                    .setNumOfFragment(1)
-				                                                         .setMediaType(3)
-				                                                         .build();
-				                                     
-				                                     DatFragment dataFragment = DatFragment.newBuilder()
-				                                                                 .setData(ByteString.copyFromUtf8(""))
-				                                                                 .build();
-				                               
-				                                     Response response = Response.newBuilder()
-				                                                 .setMsg(responseMsg)
-				                                                 .setMetaData(metadata)
-				                                                 .setDatFragment(dataFragment)
-				                                                 .build();
-				                               
-				                                     responseObserver.onNext(response);
-				                                     responseObserver.onCompleted();
-				                               }
+	        		
+				//TimeUnit.SECONDS.sleep(2);
+				new Thread() {
+				    public void run() {
+				        try {
+				        	while(true)
+							{               
+				        		TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
+								if(pc.qList.size()!=0){
+									//TimeUnit.SECONDS.sleep(2);
+									System.out.println("removing and sending out last mesg");
+									//responseMsg = pc.qList.remove(0);   
+									System.out.println(pc.qList.remove(0));					
+								}
+							}
+				        } catch(Exception v) {
+				            System.out.println(v);
+				        }
+				    }  
+				}.start();
+				
+				
 		   	   
 		   	  /* if (!responseData.isEmpty()) {
 		   		responseMsg = "Data present";
@@ -179,7 +176,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 			      responseObserver.onNext(response);
 			      responseObserver.onCompleted();
 		   	   } */
-		   	System.out.println(new DataHandler().getClusterLeaders());
+		   //	System.out.println(new DataHandler().getClusterLeaders());
 	    }
 	    catch(Exception ex) {
 	    	System.out.println(ex.getMessage());
@@ -226,11 +223,12 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		        	String receivedMessage = request.getPutRequest().getDatFragment().getData().toStringUtf8();
 		        	sender = request.getFromSender();
 		        	System.out.println(localnodes.size());
-		        	for(int i=0;i<localnodes.size();i++){	
-		        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
+		        	//for(int i=0;i<localnodes.size();i++){	
+		        		pc.mc = new MessageClient(localnodes.get(nodeNo%localnodes.size()),4568);
 		        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
 		        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
-		        	}
+		        	//}
+		        		nodeNo++;
 		        	
 		        	// TODO: Test this functionality
 		        	/* If space not available on any node in the cluster*/
