@@ -143,9 +143,9 @@ def main():
 
             # TODO: Validate input time format
             print("Enter from_time ('yyyy-MM-dd HH:mm:ss') :")
-            frm = str(raw_input())
+            frm = str(input())
             print("Enter to_time ('yyyy-MM-dd HH:mm:ss') :")
-            to = str(raw_input())
+            to = str(input())
             print("Enter the total number of filter parameters :")
             param = input()
             param_json = ""
@@ -154,13 +154,13 @@ def main():
                 for i in range(0, param):
                     param_json += "{'lhs':'"
                     print("Enter the parameter " + str(i+1) + " name : ")
-                    name = str(raw_input())
+                    name = str(input())
                     param_json += name + "', 'op':'"
                     print("Enter the parameter " + str(i+1) + " operator : ")
-                    op = str(raw_input())
+                    op = str(input())
                     param_json += op + "', 'rhs':'"
                     print("Enter the parameter " + str(i+1) + " value : ")
-                    value = str(raw_input())
+                    value = str(input())
                     if i == param-1:
                         param_json += value + "'}"
                     else:
@@ -174,7 +174,7 @@ def main():
         if sys.argv[1] == "put":
             print("Enter the folder location where you have the files to be pushed."
                   "Please note this python client only accepts mesowest files  :")
-            path = str(raw_input())
+            path = str(input())
             print(path)
             parse_and_push_files(path, clientobj)
         if sys.argv[1] not in args:
