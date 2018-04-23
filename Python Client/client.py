@@ -35,7 +35,7 @@ class client(object):
         resp = self.stub.ping(req)
         print(resp.msg)
 
-    def get(self, from_time, to_time):
+    def get(self, from_time, to_time, params_array):
         """
         Sends a get request to the server
         """
@@ -46,7 +46,7 @@ class client(object):
             toReceiver=receiver_ip,
             getRequest=GetRequest(
                 metaData=MetaData(uuid='12345'),
-                queryParams=QueryParams(from_utc=from_time, to_utc=to_time)))
+                queryParams=QueryParams(from_utc=from_time, to_utc=to_time, params_json=params_array)))
         for resp in self.stub.getHandler(req):
             print(resp.datFragment.data.decode('utf-8'))
 
@@ -143,16 +143,38 @@ def main():
 
             # TODO: Validate input time format
             print("Enter from_time ('yyyy-MM-dd HH:mm:ss') :")
-            frm = str(input())
+            frm = str(raw_input())
             print("Enter to_time ('yyyy-MM-dd HH:mm:ss') :")
-            to = str(input())
-            clientobj.get(from_time=frm, to_time=to)
+            to = str(raw_input())
+            print("Enter the total number of filter parameters :")
+            param = input()
+            param_json = ""
+            if param > 0:
+                param_json += "["
+                for i in range(0, param):
+                    param_json += "{'lhs':'"
+                    print("Enter the parameter " + str(i+1) + " name : ")
+                    name = str(raw_input())
+                    param_json += name + "', 'op':'"
+                    print("Enter the parameter " + str(i+1) + " operator : ")
+                    op = str(raw_input())
+                    param_json += op + "', 'rhs':'"
+                    print("Enter the parameter " + str(i+1) + " value : ")
+                    value = str(raw_input())
+                    if i == param-1:
+                        param_json += value + "'}"
+                    else:
+                        param_json += value + "'},"
+                param_json += "]"
+                print("Params json = " + param_json)
+
+            clientobj.get(from_time=frm, to_time=to, params_array=param_json)
             #clientobj.get(from_time="2018-03-21 01:00:00", to_time="2018-03-21 01:20:00")
 
         if sys.argv[1] == "put":
-            print("Enter the folder location where you have the files to be pushed (Please enter the path in quotes). "
+            print("Enter the folder location where you have the files to be pushed."
                   "Please note this python client only accepts mesowest files  :")
-            path = str(input())
+            path = str(raw_input())
             print(path)
             parse_and_push_files(path, clientobj)
         if sys.argv[1] not in args:
