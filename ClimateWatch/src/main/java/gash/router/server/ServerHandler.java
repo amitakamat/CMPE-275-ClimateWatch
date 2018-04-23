@@ -203,7 +203,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         rb.setId(10);
         rb.setPath("/message");
         rb.setPayload("SPACECHECK:"+ result);
-    ctx.writeAndFlush(rb.build());
+        ctx.writeAndFlush(rb.build());
 	}
 	
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {

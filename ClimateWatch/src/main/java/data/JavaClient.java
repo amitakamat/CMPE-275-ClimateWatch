@@ -107,8 +107,7 @@ public class JavaClient
                 System.out.println("Sending request");
                 Iterator<Response> getResponse = stub.getHandler(request);
                 while (getResponse.hasNext()) {
-                    System.out.println("Received response");
-                    String responseData = getResponse.next().toString();//.getDatFragment().getData().toStringUtf8();
+                    String responseData = getResponse.next().getDatFragment().getData().toStringUtf8().replace("SERVERRESPONSE", "");
                     System.out.println(responseData);
                 }
 

@@ -315,7 +315,10 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		        		nodeNo++;
 		        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
 		        		
+		        		If no space - noSpaceNodes++;
+		        		
 		        	}
+		        	if (nospacenodes == localnodes.size()){
 		        	// TODO: Test this functionality
 		        	/* If space not available on any node in the cluster*/
 		        	//ArrayList<String> clusterLeaders = new ArrayList<String>();
@@ -333,6 +336,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 //		        			break;
 //		        		//}
 //		        	}
+//	        	}
 		    	    System.out.println("Received request : "+ receivedMessage);
 		    	    chunksReceived++;
 		    	    
