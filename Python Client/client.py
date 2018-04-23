@@ -143,29 +143,30 @@ def main():
 
             # TODO: Validate input time format
             print("Enter from_time ('yyyy-MM-dd HH:mm:ss') :")
-            frm = str(input())
+            frm = str(raw_input())
             print("Enter to_time ('yyyy-MM-dd HH:mm:ss') :")
-            to = str(input())
+            to = str(raw_input())
             print("Enter the total number of filter parameters :")
             param = input()
-            param_json = "["
+            param_json = ""
             if param > 0:
+                param_json += "["
                 for i in range(0, param):
                     param_json += "{'lhs':'"
                     print("Enter the parameter " + str(i+1) + " name : ")
-                    name = str(input())
+                    name = str(raw_input())
                     param_json += name + "', 'op':'"
                     print("Enter the parameter " + str(i+1) + " operator : ")
-                    op = str(input())
+                    op = str(raw_input())
                     param_json += op + "', 'rhs':'"
                     print("Enter the parameter " + str(i+1) + " value : ")
-                    value = str(input())
+                    value = str(raw_input())
                     if i == param-1:
                         param_json += value + "'}"
                     else:
                         param_json += value + "'},"
-            param_json += "]"
-            print("Params json = " + param_json)
+                param_json += "]"
+                print("Params json = " + param_json)
 
             clientobj.get(from_time=frm, to_time=to, params_array=param_json)
             #clientobj.get(from_time="2018-03-21 01:00:00", to_time="2018-03-21 01:20:00")
@@ -173,7 +174,7 @@ def main():
         if sys.argv[1] == "put":
             print("Enter the folder location where you have the files to be pushed."
                   "Please note this python client only accepts mesowest files  :")
-            path = str(input())
+            path = str(raw_input())
             print(path)
             parse_and_push_files(path, clientobj)
         if sys.argv[1] not in args:

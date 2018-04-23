@@ -75,7 +75,7 @@ public class App
 	    });
 	  }
 
-	  private void stop() {
+	  public void stop() {
 	    if (server != null) {
 	      server.shutdown();
 	    }
@@ -100,5 +100,6 @@ public class App
       	System.out.println("Server started...");
       	// Don't exit the main thread. Wait until server is terminated.
       	appServer.blockUntilShutdown();
+      	
     }
 }

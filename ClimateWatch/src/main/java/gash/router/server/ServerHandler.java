@@ -15,41 +15,31 @@
  */
 package gash.router.server;
 
-import java.beans.Beans;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.entrypoint.socket.PC;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 import com.service.grpc.MongoHandler;
 
-import gash.messaging.Message;
 import gash.messaging.Node;
 import gash.router.container.RoutingConf;
-import gash.router.server.resources.RouteResource;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.CharsetUtil;
 import routing.Pipe.Route;
-
-import java.util.List;
-import com.mongodb.BasicDBObjectBuilder;
 
 /**
  * The message handler processes json messages that are delimited by a 'newline'
@@ -67,6 +57,8 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 	private HashMap<String, String> routing;
 	
 	public Node n;
+	public Timer timer = new Timer();
+	private CheckIfLeaderPinged leaderCheckTimer;
 
 	public ServerHandler(RoutingConf conf,Node n) {
 		this.n=n;
@@ -114,7 +106,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		        //System.out.println(cursor.next());
 		        resp += String.valueOf(cursor.next())+" \n";
 		    }*/
-			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, filters[2]);
+			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, "");
 			for (int i = 0; i < responseData.size(); i++) {
 				                               //System.out.println(responseData.get(i).toString());
 				                               //ctx.writeAndFlush("SERVERRESPONSE");
@@ -211,8 +203,8 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		//Route.Builder rb = Route.newBuilder();
 	      // ((Route.Builder)msg).getPayload();
 		String recvdMesg=msg.toString();//((Route.Builder)msg).getPayload();
-      //  System.out.println(
-        //    "Server received: " + recvdMesg);
+        System.out.println(
+            "Server received: " + recvdMesg);
         
         recvdMesg=recvdMesg.split("payload: \"")[1].toString();
        // System.out.println("String is below");
@@ -241,6 +233,21 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         	//queryToDB(splitMesg[1]);
         }
         
+        if(splitMesg[0].contains("HEARTBEAT")){
+        	//resetHeartBeatTimer
+        	System.out.println("Recieved HeartBeat");
+        	
+	        	if (leaderCheckTimer != null) {
+	        					timer.cancel();
+	        					timer.purge();
+				}
+		
+				leaderCheckTimer = new CheckIfLeaderPinged();
+				timer = new Timer();
+				timer.schedule(leaderCheckTimer, 10 * 1000);
+        		
+        }
+        
         
     }
 
@@ -257,5 +264,29 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         cause.printStackTrace();
         ctx.close();
     }
+    
+    class CheckIfLeaderPinged extends TimerTask {
+
+		@Override
+		public void run() {
+			{
+				//
+				System.out.println("Leader LOST , restarting...");
+				
+				
+				try {
+					PC pc=PC.getInstance();
+					pc.updateLeader();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+		}
+
+	}
+
 
 }
