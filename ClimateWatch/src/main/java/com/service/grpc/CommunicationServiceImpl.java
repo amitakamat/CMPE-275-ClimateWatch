@@ -1,6 +1,7 @@
 package com.service.grpc;
 
 import io.grpc.stub.StreamObserver;
+import routing.Pipe.Route;
 import io.grpc.*;
 import com.google.protobuf.ByteString;
 
@@ -76,6 +77,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 
 		   System.out.println("Get call Successfull");
 		   String responseMsg ;
+		   String sender = request.getFromSender();
 		   QueryParams params = request.getGetRequest().getQueryParams();
 	   	   try {  
 			   	Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getFromUtc());
@@ -85,7 +87,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 				for(int i=0;i<localnodes.size();i++){	
 	        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
 	        		pc.mc.addListener(pc);
-	        		pc.mc.postMessage(pc.addMessageTypeGETQUERY(params.getFromUtc()+"and"+params.getToUtc()));
+	        		pc.mc.postMessage(pc.addMessageTypeGETQUERY(params.getFromUtc()+"and"+params.getToUtc()+"and"+params.getParamsJson()));
 	        	}
 	        		
 				//TimeUnit.SECONDS.sleep(2);
@@ -126,6 +128,23 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 				        }
 				    }  
 				}.start();
+				
+			// If no response
+			/*	ArrayList<String> clusterLeaders = new DataHandler().getClusterLeaders();
+	        	for(int i=0; i<clusterLeaders.size(); i++) {
+	        		if(!clusterLeaders.get(i).equals(pc.ip) && !clusterLeaders.get(i).equals(sender)){
+	        			//System.out.println("My IP : " + pc.ip);
+	        			ClusterClient c = new ClusterClient(clusterLeaders.get(i));
+	        			Response r = c.ping();
+	        			System.out.println(r.getMsg());
+	        			if(r.getCode()== StatusCode.Ok) {
+		        			c.putRequest(request);
+		        			Thread.sleep(500);
+		        			c.channelShutDown();
+		        			break;
+	        			}	        			
+	        		}
+	        	}*/
 				
 				
 		   	   
@@ -242,13 +261,27 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		        	String receivedMessage = request.getPutRequest().getDatFragment().getData().toStringUtf8();
 		        	sender = request.getFromSender();
 		        	System.out.println(localnodes.size());
-		        	//for(int i=0;i<localnodes.size();i++){	
-		        		pc.mc = new MessageClient(localnodes.get(nodeNo%localnodes.size()),4568);
-		        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
-		        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
-		        	//}
+	        		pc.mc = new MessageClient(localnodes.get(nodeNo%localnodes.size()),4568);
+	        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
+		        		/*TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
+						if(pc.qList.size()!=0){
+							//TimeUnit.SECONDS.sleep(2);
+							System.out.println("get response for space");
+							//responseMsg = pc.qList.remove(0);   
+							System.out.println(pc.qList.remove(0));	
+						}
+						*/
+	        		// If has space
+	        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
+	        		nodeNo++;
+	        		
+	        		/*If not
+	        		int noSpaceNodes = 1;
+		        	for(int i=0; i<localnodes.size()-1; i++){
 		        		nodeNo++;
-		        	
+		        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
+		        		
+		        	}
 		        	// TODO: Test this functionality
 		        	/* If space not available on any node in the cluster*/
 		        	//ArrayList<String> clusterLeaders = new ArrayList<String>();

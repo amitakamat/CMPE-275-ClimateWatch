@@ -114,7 +114,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		        //System.out.println(cursor.next());
 		        resp += String.valueOf(cursor.next())+" \n";
 		    }*/
-			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, "");
+			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, filters[2]);
 			for (int i = 0; i < responseData.size(); i++) {
 				                               //System.out.println(responseData.get(i).toString());
 				                               //ctx.writeAndFlush("SERVERRESPONSE");
@@ -190,15 +190,20 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		}
 	}
 	
-	public boolean hasSpace() {
+	public void hasSpace(ChannelHandlerContext ctx) {
+		boolean result = false;
 		File f = new File("C:/");
 	   // System.out.println("Printing the total space");
 	    double space = f.getTotalSpace()/1000000.00;
 	    System.out.println( f.getTotalSpace()/1000000.00 +" Megabytes");
-	    if(space < 10000) {
-	    	return false;
+	    if(space > 10000) {
+	    	result = true;
 	    }
-	    return true;
+	    Route.Builder rb = Route.newBuilder();
+        rb.setId(10);
+        rb.setPath("/message");
+        rb.setPayload("SERVERRESPONSE:"+ result);
+    ctx.writeAndFlush(rb.build());
 	}
 	
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -230,7 +235,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         	//queryToDB(splitMesg[1]);
         }
         if(splitMesg[0].contains("GETSPACE")){
-        	hasSpace();
+        	hasSpace(ctx);
         	//queryToDB(splitMesg[1]);
         }
         

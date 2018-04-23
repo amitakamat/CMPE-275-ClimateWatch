@@ -45,7 +45,7 @@ public class ClusterClient {
 	      StreamObserver<Response> responseObserver = new StreamObserver<Response>() {
 	    	  @Override
 	          public void onNext(Response resp) {
-	            System.out.println("Sent data push request. Checking for disk Space....");
+	            System.out.println("Sent data push request to another cluster....");
 	            System.out.println(resp.getMsg());
 	          }
 	    	  

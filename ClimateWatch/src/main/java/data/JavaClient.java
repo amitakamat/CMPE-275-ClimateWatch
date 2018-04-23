@@ -17,9 +17,14 @@ public class JavaClient
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter task [get / put / ping]: ");
         String task = scanner.nextLine();
+        
+        /* Update this before running client */
+        String sender_ip = "127.0.0.1";
+        String receiver_ip = "127.0.0.1";
+        
 
 
-        final ManagedChannel channel = ManagedChannelBuilder.forTarget("127.0.0.1:8080") //ManagedChannelBuilder.forTarget("169.254.79.93:8080")
+        final ManagedChannel channel = ManagedChannelBuilder.forTarget(receiver_ip+":8080") //ManagedChannelBuilder.forTarget("169.254.79.93:8080")
                 .usePlaintext(true)
                 .build();
         CommunicationServiceGrpc.CommunicationServiceBlockingStub stub = CommunicationServiceGrpc.newBlockingStub(channel);
@@ -33,8 +38,8 @@ public class JavaClient
                         .build();
 
                 Request request = Request.newBuilder()
-                        .setFromSender("from sender")
-                        .setToReceiver("to Receiver")
+                        .setFromSender(sender_ip)
+                        .setToReceiver(receiver_ip)
                         .setPing(pingRequest)
                         .build();
 
@@ -50,20 +55,20 @@ public class JavaClient
                 System.out.print("\nEnter to_time 'yyyy-MM-dd HH:mm:ss': ");
                 String to_time = scanner.nextLine();
                 System.out.print("\nEnter the total number of filter parameters: ");
-                int param = scanner.nextInt();
+                int param = Integer.parseInt(scanner.nextLine());
                 String param_json = "";
 
                 if (param > 0){
                     param_json += "[";
                     for (int i = 0; i < param; i++){
                         param_json += "{'lhs':'";
-                        System.out.print("\nEnter the parameter " + (i + 1) + " name : ");
+                        System.out.println("\nEnter the parameter " + (i + 1) + " name : ");
                         String name = scanner.nextLine();
                         param_json += name + "', 'op':'";
-                        System.out.print("\nEnter the parameter " + (i + 1) + " operator : ");
+                        System.out.println("\nEnter the parameter " + (i + 1) + " operator : ");
                         String op = scanner.nextLine();
                         param_json += op + "', 'rhs':'";
-                        System.out.print("\nEnter the parameter " + (i + 1) + " value : ");
+                        System.out.println("\nEnter the parameter " + (i + 1) + " value : ");
                         String value = scanner.nextLine();
                         if (i == (param - 1)){
                             param_json += value + "'}";
@@ -75,7 +80,7 @@ public class JavaClient
                     param_json += "]";
                     //System.out.println("Params json = " + param_json);
                 }
-
+                System.out.println("Params json = " + param_json);
 
                 QueryParams queryParams = QueryParams.newBuilder()
                         .setFromUtc(from_time)
@@ -96,8 +101,8 @@ public class JavaClient
                         .setQueryParams(queryParams)
                         .build();
                 request = Request.newBuilder()
-                        .setFromSender("from sender")
-                        .setToReceiver("to Receiver")
+                        .setFromSender(sender_ip)
+                        .setToReceiver(receiver_ip)
                         .setGetRequest(getRequest)
                         .build();
 
