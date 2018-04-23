@@ -83,21 +83,34 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 			   	Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getFromUtc());
 				Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getToUtc());
 				//List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, params.getParamsJson());
-				
+				System.out.println(params.getParamsJson());
 				for(int i=0;i<localnodes.size();i++){	
 	        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
 	        		pc.mc.addListener(pc);
 	        		pc.mc.postMessage(pc.addMessageTypeGETQUERY(params.getFromUtc()+"and"+params.getToUtc()+"and"+params.getParamsJson()));
 	        	}
 	        		
-				//TimeUnit.SECONDS.sleep(2);
-				new Thread() {
+				class checker
+				{
+				
+				 Boolean hasData = false;
+				 Integer retry=0;
+				 Integer hasDataVal=0;
+				
+				
+				}
+				
+				final checker chks = new checker();
+				new Thread() {	
 				    public void run() {
 				        try {
 				        	while(true)
-							{               
+							{          
+				        		
 				        		TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
 								if(pc.qList.size()!=0){
+									chks.hasData=true;
+									chks.hasDataVal=1;
 									System.out.println("removing and sending out last mesg");   
 									//System.out.println(pc.qList.remove(0));	
 									final String responseMsg1 = "Data not present";	   
@@ -112,6 +125,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 										      		  .setData(ByteString.copyFromUtf8(pc.qList.remove(0)))
 										      		  .build();
 								
+								      
 								      Response response = Response.newBuilder()
 								   	          .setMsg(responseMsg1)
 								   	          .setMetaData(metadata)
@@ -120,7 +134,22 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 								
 								      responseObserver.onNext(response);
 								      //responseObserver.onCompleted();
+								      if(pc.qList.size()==0){
+								    	  System.out.println("Sent all data");
+								    	  responseObserver.onCompleted();
+								    	  return;
+								      }
 									
+								}
+								else{
+									chks.retry++;
+								}
+								
+								if(chks.retry>=10000){
+									System.out.println("Found no data");
+									chks.hasDataVal=2;
+									responseObserver.onCompleted();
+				        			return;
 								}
 							}
 				        } catch(Exception v) {
@@ -129,91 +158,96 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 				    }  
 				}.start();
 				
-			// If no response
-			/*	ArrayList<String> clusterLeaders = new DataHandler().getClusterLeaders();
-	        	for(int i=0; i<clusterLeaders.size(); i++) {
-	        		if(!clusterLeaders.get(i).equals(pc.ip) && !clusterLeaders.get(i).equals(sender)){
-	        			//System.out.println("My IP : " + pc.ip);
-	        			ClusterClient c = new ClusterClient(clusterLeaders.get(i));
-	        			Response r = c.ping();
-	        			System.out.println(r.getMsg());
-	        			if(r.getCode()== StatusCode.Ok) {
-		        			c.putRequest(request);
-		        			Thread.sleep(500);
-		        			c.channelShutDown();
-		        			break;
-	        			}	        			
-	        		}
-	        	}*/
+				while(chks.hasDataVal==0){
+					//System.out.println("Waiting for our cluster response...!");
+				}
 				
-				
-		   	   
-		   	  /* if (!responseData.isEmpty()) {
-		   		responseMsg = "Data present";
-		   		   int fragment = 1;
-		   		   int chunkSize = 0;
-	   			   String responseChunk ="";
-		   		   for(int j =0; j< responseData.size(); j++) {
-		   			   System.out.println("Chunk Size: " + String.valueOf(chunkSize));
-		   			   DBObject record = responseData.get(j);
-		   			    record.removeField("_id");
+				if(chks.hasDataVal == 2) {
+					boolean receivedData = false;
+					String dataResponse = "";
+					System.out.println("No data in our cluster");
+					//ArrayList<String> clusterLeaders = new ArrayList<String>();
+					ArrayList<String> clusterLeaders = new DataHandler().getClusterLeaders();
+					//clusterLeaders.add("169.254.204.172");
+		        	for(int i=0; i<clusterLeaders.size(); i++) {
+		        		if(!clusterLeaders.get(i).equals(pc.ip) && !clusterLeaders.get(i).equals(sender) && !receivedData){
+		        			//System.out.println("My IP : " + pc.ip);
+		        			ClusterClient c = new ClusterClient(clusterLeaders.get(i));
+		        			System.out.println("Sending ping to : " + clusterLeaders.get(i));
+		        			Response r = c.ping();
+		        			System.out.println(r.getMsg());
+		        			if(r.getCode()== StatusCode.Ok) {
+		        				System.out.println("Sending get to : " + clusterLeaders.get(i));
+			        			dataResponse = c.getRequest(request);
+			        			Thread.sleep(500);
+			        			if(!dataResponse.equals("")){
+			        				receivedData = true;
+			        			}
+			        			c.channelShutDown();
+			        			break;
+		        			}	        			
+		        		}
+		        	}	   	   
+		        	if (!dataResponse.isEmpty()) {
+		        		responseMsg = "Data present";
+			   		   int fragment = 1;
+			   		   int chunkSize = 0;
+		   			   String responseChunk ="";
+		   			   String[] respArray = dataResponse.split("\n");
+		   			   for(int j =0; j< respArray.length; j++) {
+			   			   System.out.println("Chunk Size: " + String.valueOf(chunkSize));
+			   			    
+			   			   responseChunk += respArray[j];
 			   			
-			   			String responseRecord = "";
-			   			for(int i=0; i<headers.length; i++) {
-			   				if(i == headers.length-1)
-			   					responseRecord+=record.get(headers[i]) + "\n";
-			   				else
-			   					responseRecord+=record.get(headers[i]) + "\t";
-			   			}
-			   			responseChunk += responseRecord;
-			   			
-			   			if(chunkSize >= maxChunkSize || j>=responseData.size()-1) {
-			   				MetaData metadata = MetaData.newBuilder()
-				   	   		          .setUuid(String.valueOf(fragment))
-				   	   		          .setNumOfFragment(fragment)
-				   	   		          .setMediaType(3)
-				   	   		          .build();
-				   			DatFragment dataFragment = DatFragment.newBuilder()
-				   			      		  .setData(ByteString.copyFromUtf8(responseChunk))
-				   			      		  .build();
+				   			if(chunkSize >= maxChunkSize || j>=respArray.length-1) {
+				   				MetaData metadata = MetaData.newBuilder()
+					   	   		          .setUuid("12345")
+					   	   		          .setNumOfFragment(1)
+					   	   		          .setMediaType(3)
+					   	   		          .build();
+					   			DatFragment dataFragment = DatFragment.newBuilder()
+					   			      		  .setData(ByteString.copyFromUtf8(responseChunk))
+					   			      		  .build();
+					   			
+					   			Response response =Response.newBuilder()
+					   	   	          .setMsg(responseMsg)
+					   	   	          .setMetaData(metadata)
+					   	   	          .setDatFragment(dataFragment)
+					   	   	          .build();
+					   		  System.out.println(responseChunk);
+					   	      responseObserver.onNext(response);
+					   	      responseChunk = "";
+					   	      chunkSize = 0;
+				   			}
 				   			
-				   			Response response =Response.newBuilder()
-				   	   	          .setMsg(responseMsg)
-				   	   	          .setMetaData(metadata)
-				   	   	          .setDatFragment(dataFragment)
-				   	   	          .build();
-				   		  System.out.println(responseChunk);
-				   	      responseObserver.onNext(response);
-				   	      responseChunk = "";
-				   	      chunkSize = 0;
-			   		   }
-			   		chunkSize++;
-		   		   }
+				   			chunkSize++;
+		   			   }
 			   			
-			   	   responseObserver.onCompleted();
-		   	   }
-		   	   else {
-		   		   responseMsg = "Data not present";	   
-		      
-			       MetaData metadata = MetaData.newBuilder()
-			   		          .setUuid("")
-			   		          .setNumOfFragment(1)
-			   		          .setMediaType(3)
-			   		          .build();
+		   			   responseObserver.onCompleted();
+			   	   }
+			   	   else {
+			   		   responseMsg = "Data not present on any cluster";	   
 			      
-			      DatFragment dataFragment = DatFragment.newBuilder()
-					      		  .setData(ByteString.copyFromUtf8(""))
-					      		  .build();
-			
-			      Response response = Response.newBuilder()
-			   	          .setMsg(responseMsg)
-			   	          .setMetaData(metadata)
-			   	          .setDatFragment(dataFragment)
-			   	          .build();
-			
-			      responseObserver.onNext(response);
-			      responseObserver.onCompleted();
-		   	   } */
+				       MetaData metadata = MetaData.newBuilder()
+				   		          .setUuid("")
+				   		          .setNumOfFragment(1)
+				   		          .setMediaType(3)
+				   		          .build();
+				      
+				      DatFragment dataFragment = DatFragment.newBuilder()
+						      		  .setData(ByteString.copyFromUtf8("No data in any cluster"))
+						      		  .build();
+				
+				      Response response = Response.newBuilder()
+				   	          .setMsg(responseMsg)
+				   	          .setMetaData(metadata)
+				   	          .setDatFragment(dataFragment)
+				   	          .build();
+				
+				      responseObserver.onNext(response);
+				      responseObserver.onCompleted();
+			   	   } 
+				}
 		   //	System.out.println(new DataHandler().getClusterLeaders());
 	    }
 	    catch(Exception ex) {
@@ -263,14 +297,14 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		        	System.out.println(localnodes.size());
 	        		pc.mc = new MessageClient(localnodes.get(nodeNo%localnodes.size()),4568);
 	        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
-		        		/*TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
-						if(pc.qList.size()!=0){
+		        		TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
+						if(pc.qList_space.size()!=0){
 							//TimeUnit.SECONDS.sleep(2);
 							System.out.println("get response for space");
 							//responseMsg = pc.qList.remove(0);   
 							System.out.println(pc.qList.remove(0));	
 						}
-						*/
+						
 	        		// If has space
 	        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
 	        		nodeNo++;

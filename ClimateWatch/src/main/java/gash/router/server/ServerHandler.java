@@ -194,7 +194,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 	    Route.Builder rb = Route.newBuilder();
         rb.setId(10);
         rb.setPath("/message");
-        rb.setPayload("SERVERRESPONSE:"+ result);
+        rb.setPayload("SPACECHECK:"+ result);
     ctx.writeAndFlush(rb.build());
 	}
 	
@@ -219,8 +219,10 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         }
         if(splitMesg[0].contains("GETQUERY")){
         	System.out.println(splitMesg[1].substring(0, splitMesg[1].length()-1));
-
-        	queryDB1(splitMesg[1].substring(0, splitMesg[1].length()-1),ctx);
+        	System.out.println("Payload: "+ splitMesg[1].substring(0, splitMesg[1].length()-1));
+        	String payload =  splitMesg[1].substring(0, splitMesg[1].length()-2).replace("\\", "");
+        	System.out.println("Payload: "+ payload);
+        	queryDB1(payload,ctx);
         }
         if(splitMesg[0].contains("ping")){
 

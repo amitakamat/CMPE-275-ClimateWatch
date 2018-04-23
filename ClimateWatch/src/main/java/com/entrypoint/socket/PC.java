@@ -39,6 +39,8 @@ public class PC extends Node implements CommListener {
 	public App appServer;
 
 	public List<String> qList;
+	public List<String> qList_space;
+
 
 	public static PC instance = null;
 
@@ -64,11 +66,13 @@ public class PC extends Node implements CommListener {
 		// Connect to local redis
 		initDB();
 
-		// Start local server
-		File cf = new File("resources/routing.conf");
-		this.ms = new MessageServer(cf, this);
 
-		this.qList = new ArrayList<String>();
+		//Start local server
+	    File cf=new File("resources/routing.conf");
+		this.ms=new MessageServer(cf,this);
+
+		this.qList=new ArrayList<String>();
+		this.qList_space=new ArrayList<String>();
 
 		Runnable startServerThread = new StartServerThread(this.ms);
 		new Thread(startServerThread).start();
@@ -88,10 +92,12 @@ public class PC extends Node implements CommListener {
 
 	}
 
-	public static PC getInstance() throws Exception {
-		if (instance == null) {
-			instance = new PC(1, EntryPoint.getIP());
-			// instance = new PC(1,"localhost");
+	public static PC getInstance() throws Exception
+	{
+		if(instance==null)
+		{
+			instance = new PC(1,EntryPoint.getIP());
+			//instance = new PC(1,"169.254.198.56");
 		}
 		return instance;
 
@@ -103,16 +109,14 @@ public class PC extends Node implements CommListener {
 	}
 
 	@Override
-	public void onMessage(Route msg) {
-		// System.out.println("Final PC recieved ---> " + msg.getPayload());
+	       public void onMessage(Route msg) {
+	               //System.out.println("Final PC recieved ---> " + msg.getPayload());
+	               if(msg.getPayload().contains("SERVERRESPONSE"))
+	            	   qList.add(msg.getPayload());
+	               if(msg.getPayload().contains("SPACECHECK"))
+	            	   qList_space.add(msg.getPayload());
 
-		qList.add(msg.getPayload());
-		/*
-		 * return new StreamObserver<Request>() { }
-		 */
-
-	}
-
+	       }
 	public void initDB() {
 		jedis = new Jedis("redis-11146.c11.us-east-1-2.ec2.cloud.redislabs.com", 11146);
 		jedis.auth("CMPE295");
