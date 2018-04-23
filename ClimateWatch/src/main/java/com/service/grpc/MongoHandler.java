@@ -50,14 +50,13 @@ public class MongoHandler {
 		System.out.println(toTime);
 		BasicDBObject query = new BasicDBObject();
 		query.put("WeatherDate", BasicDBObjectBuilder.start("$gte", fromTime).add("$lte", toTime).get());
-		if(parameters.length() != 0) {
+		if(parameters.length() > 2) {
 			JSONArray jsonarray = new JSONArray(parameters);
 			for (int i = 0; i < jsonarray.length(); i++) {
 			    JSONObject jsonobject = jsonarray.getJSONObject(i);
 			    String op = "$" + jsonobject.getString("op");
 			    query.put(jsonobject.getString("lhs"), new BasicDBObject(op, jsonobject.getString("rhs")));
-			}
-			
+			}			
 		}
 		//BasicDBObject query = new BasicDBObject("WeatherDate", new BasicDBObject("$gte", fromTime).append("$lte", toTime));
 		DBCursor cursor = dbCollection.find(query);

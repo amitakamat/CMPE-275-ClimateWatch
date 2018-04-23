@@ -150,7 +150,6 @@ def main():
             param = input()
             param_json = "["
             if param > 0:
-                param_json += "["
                 for i in range(0, param):
                     param_json += "{'lhs':'"
                     print("Enter the parameter " + str(i+1) + " name : ")

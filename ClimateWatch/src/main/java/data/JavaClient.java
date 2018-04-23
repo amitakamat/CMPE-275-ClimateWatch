@@ -56,10 +56,9 @@ public class JavaClient
                 String to_time = scanner.nextLine();
                 System.out.print("\nEnter the total number of filter parameters: ");
                 int param = Integer.parseInt(scanner.nextLine());
-                String param_json = "";
+                String param_json = "[";
 
                 if (param > 0){
-                    param_json += "[";
                     for (int i = 0; i < param; i++){
                         param_json += "{'lhs':'";
                         System.out.println("\nEnter the parameter " + (i + 1) + " name : ");
@@ -77,9 +76,9 @@ public class JavaClient
                             param_json += value + "'},";
                         }
                     }
-                    param_json += "]";
                     //System.out.println("Params json = " + param_json);
                 }
+                param_json += "]";
                 System.out.println("Params json = " + param_json);
 
                 QueryParams queryParams = QueryParams.newBuilder()
@@ -105,10 +104,11 @@ public class JavaClient
                         .setToReceiver(receiver_ip)
                         .setGetRequest(getRequest)
                         .build();
-
+                System.out.println("Sending request");
                 Iterator<Response> getResponse = stub.getHandler(request);
                 while (getResponse.hasNext()) {
-                    String responseData = getResponse.next().getDatFragment().getData().toStringUtf8();
+                    System.out.println("Received response");
+                    String responseData = getResponse.next().toString();//.getDatFragment().getData().toStringUtf8();
                     System.out.println(responseData);
                 }
 

@@ -83,7 +83,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 			   	Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getFromUtc());
 				Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(params.getToUtc());
 				//List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, params.getParamsJson());
-				
+				System.out.println(params.getParamsJson());
 				for(int i=0;i<localnodes.size();i++){	
 	        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
 	        		pc.mc.addListener(pc);
@@ -136,6 +136,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 								      //responseObserver.onCompleted();
 								      if(pc.qList.size()==0){
 								    	  System.out.println("Sent all data");
+								    	  responseObserver.onCompleted();
 								    	  return;
 								      }
 									
@@ -144,9 +145,10 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 									chks.retry++;
 								}
 								
-								if(chks.retry>=100){
+								if(chks.retry>=10000){
 									System.out.println("Found no data");
 									chks.hasDataVal=2;
+									responseObserver.onCompleted();
 				        			return;
 								}
 							}
@@ -157,7 +159,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 				}.start();
 				
 				while(chks.hasDataVal==0){
-					System.out.println("Waiting for our cluster response...!");
+					//System.out.println("Waiting for our cluster response...!");
 				}
 				
 				if(chks.hasDataVal == 2) {
