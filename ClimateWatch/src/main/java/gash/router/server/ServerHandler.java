@@ -244,7 +244,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		
 				leaderCheckTimer = new CheckIfLeaderPinged();
 				timer = new Timer();
-				timer.schedule(leaderCheckTimer, 10 * 1000);
+				timer.schedule(leaderCheckTimer, 70 * 1000);
         		
         }
         
