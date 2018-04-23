@@ -148,7 +148,7 @@ def main():
             to = str(input())
             print("Enter the total number of filter parameters :")
             param = input()
-            param_json = ""
+            param_json = "["
             if param > 0:
                 param_json += "["
                 for i in range(0, param):
@@ -165,8 +165,8 @@ def main():
                         param_json += value + "'}"
                     else:
                         param_json += value + "'},"
-                param_json += "]"
-                print("Params json = " + param_json)
+            param_json += "]"
+            print("Params json = " + param_json)
 
             clientobj.get(from_time=frm, to_time=to, params_array=param_json)
             #clientobj.get(from_time="2018-03-21 01:00:00", to_time="2018-03-21 01:20:00")
