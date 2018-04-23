@@ -93,8 +93,8 @@ public class PC extends Node implements CommListener{
 	{
 		if(instance==null)
 		{
-			//instance = new PC(1,EntryPoint.getIP());
-			instance = new PC(1,"169.254.198.56");
+			instance = new PC(1,EntryPoint.getIP());
+			//instance = new PC(1,"169.254.198.56");
 		}
 		return instance;
 		
