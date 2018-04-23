@@ -96,10 +96,29 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 							{               
 				        		TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
 								if(pc.qList.size()!=0){
-									//TimeUnit.SECONDS.sleep(2);
-									System.out.println("removing and sending out last mesg");
-									//responseMsg = pc.qList.remove(0);   
-									System.out.println(pc.qList.remove(0));					
+									System.out.println("removing and sending out last mesg");   
+									//System.out.println(pc.qList.remove(0));	
+									final String responseMsg1 = "Data not present";	   
+								      
+								       MetaData metadata = MetaData.newBuilder()
+								   		          .setUuid("")
+								   		          .setNumOfFragment(1)
+								   		          .setMediaType(3)
+								   		          .build();
+								      
+								      DatFragment dataFragment = DatFragment.newBuilder()
+										      		  .setData(ByteString.copyFromUtf8(pc.qList.remove(0)))
+										      		  .build();
+								
+								      Response response = Response.newBuilder()
+								   	          .setMsg(responseMsg1)
+								   	          .setMetaData(metadata)
+								   	          .setDatFragment(dataFragment)
+								   	          .build();
+								
+								      responseObserver.onNext(response);
+								      //responseObserver.onCompleted();
+									
 								}
 							}
 				        } catch(Exception v) {
