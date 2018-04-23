@@ -16,6 +16,7 @@
 package gash.router.server;
 
 import java.beans.Beans;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -132,7 +133,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		return resp;
 	}
 	public void writeToDB(String split){
-    	String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
+    	String[] headers = {"station", "WeatherDate", "MNET", "latitude", "longitude", "elevation", "temperature", "SKNT", "DRCT", "GUST", "PMSL", "altitude", "DWPF", "RELH", "WTHR", "P24I"};
 		 //MongoClient mongoClient = null;
 		 //DBCollection dbCollection = null; 
 		 
@@ -153,13 +154,11 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
     	int lineNo=0;
     	String line;
     	StringBuffer stringBuffer = new StringBuffer();
-    	int count=0;
     	
     	while(entries[lineNo]!=null){
     		line=entries[lineNo];
-			if(line.length()!=0 && count>3) {
+			if(line.length()!=0) {
 				stringBuffer.append(line);
-				System.out.println("\n");
 				String[] lineArray = line.split(",");
 				int size = 0;
 				int j = 0;
@@ -170,7 +169,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 						if(j==1) {
 							//lineArray[i].replaceAll("/", " ");
 							try {
-								Date date = new SimpleDateFormat("yyyyMMdd/HHmm").parse(lineArray[i]);
+								Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(lineArray[i]);
 								messageObject.append(headers[j], date);
 							}
 							catch(Exception ex) {
@@ -187,10 +186,20 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 				//System.out.println(line);
 				//stringBuffer.append("\n\n\n");
 			}
-			count++;
+			lineNo++;
 		}
 	}
-
+	
+	public boolean hasSpace() {
+		File f = new File("C:/");
+	   // System.out.println("Printing the total space");
+	    double space = f.getTotalSpace()/1000000.00;
+	    System.out.println( f.getTotalSpace()/1000000.00 +" Megabytes");
+	    if(space < 10000) {
+	    	return false;
+	    }
+	    return true;
+	}
 	
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
         //ByteBuf in = (ByteBuf) msg;
@@ -218,6 +227,10 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
         }
         if(splitMesg[0].contains("ping")){
 
+        	//queryToDB(splitMesg[1]);
+        }
+        if(splitMesg[0].contains("GETSPACE")){
+        	hasSpace();
         	//queryToDB(splitMesg[1]);
         }
         

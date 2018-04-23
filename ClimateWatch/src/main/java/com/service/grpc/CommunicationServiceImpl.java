@@ -16,7 +16,6 @@ import com.service.grpc.MongoHandler;
 
 import gash.router.client.MessageClient;
 
-import com.cmpe275.grpcComm.CommunicationServiceGrpc;
 import com.cmpe275.grpcComm.*;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -191,10 +190,9 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
     	System.out.println("Received a PUT request");
 	    
 	    System.out.println();
-	    
-	    File f = new File("//mnt//c//");
-	    System.out.println("Printing the total space");
-	    System.out.println(f.getTotalSpace()/1000000.00 +" Megabytes");
+	   // File f = new File("//mnt//c//");
+	    //System.out.println("Printing the total space");
+	    //System.out.println(f.getTotalSpace()/1000000.00 +" Megabytes");
 //	    ArrayList<String> clusterLeaders = new ArrayList<String>();
 //    	clusterLeaders.add("169.254.204.172");
 //    	//System.out.println("My IP : " + pc.ip);
@@ -220,15 +218,17 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	    
 	    return new StreamObserver<Request>() {
 		    int chunksReceived = 0;
+		    String sender = "";
 
 	        @Override
 	        public void onNext(Request request) {
 	        	try {
 		        	String receivedMessage = request.getPutRequest().getDatFragment().getData().toStringUtf8();
-		        	
+		        	sender = request.getFromSender();
+		        	System.out.println(localnodes.size());
 		        	for(int i=0;i<localnodes.size();i++){	
 		        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
-		        		
+		        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
 		        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
 		        	}
 		        	
@@ -238,7 +238,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 //		        	clusterLeaders.add("169.254.204.172");
 		        	ArrayList<String> clusterLeaders = new DataHandler().getClusterLeaders();
 //		        	for(int i=0; i<clusterLeaders.size(); i++) {
-//		        		//if(!clusterLeaders.get(i).equals(pc.ip)){
+//		        		//if(!clusterLeaders.get(i).equals(pc.ip) && !clusterLeaders.get(i).equals(sender)){
 //		        			//System.out.println("My IP : " + pc.ip);
 //		        			ClusterClient c = new ClusterClient(clusterLeaders.get(i));
 //		        			c.putRequest(request);

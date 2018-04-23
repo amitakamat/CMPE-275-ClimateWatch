@@ -308,6 +308,12 @@ public class PC extends Node implements CommListener{
 			sb.append("Type:GETQUERY ").append(content);
 			return sb.toString();
 		}
+		
+		public String addMessageTypeGETSPACE(){
+			StringBuilder sb=new StringBuilder();
+			sb.append("Type:GETSPACE");
+			return sb.toString();
+		}
 
 		
 	  public void parseMesowest() {

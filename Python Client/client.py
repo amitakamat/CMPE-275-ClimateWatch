@@ -11,44 +11,64 @@ import sys
 import os
 import uuid
 
+# Update this with your IP and server IP before running the client
+sender_ip = '127.0.0.1'
+receiver_ip = '127.0.0.1'
+
 
 class client(object):
-    def __init__(self, host='127.0.0.1', port=8080):
+    def __init__(self, host=receiver_ip, port=8080):
         channel = grpc.insecure_channel('%s:%d' % (host, port))
         self.stub = data_pb2_grpc.CommunicationServiceStub(channel)
         if self.stub is not None:
             print('Connection established with GRPC server.....\n')
 
     def ping(self, message):
+        """
+        Pings the server
+        """
+        print("Logger : Sending Ping request to " + receiver_ip)
         req = Request(
-            fromSender="sender",
-            toReceiver="receiver",
+            fromSender=sender_ip,
+            toReceiver=receiver_ip,
             ping=PingRequest(msg=message))
         resp = self.stub.ping(req)
         print(resp.msg)
 
     def get(self, from_time, to_time):
+        """
+        Sends a get request to the server
+        """
+
+        print("Logger : Sending GET request to " + receiver_ip)
         req = Request(
-            fromSender="sender",
-            toReceiver="receiver",
+            fromSender=sender_ip,
+            toReceiver=receiver_ip,
             getRequest=GetRequest(
                 metaData=MetaData(uuid='12345'),
                 queryParams=QueryParams(from_utc=from_time, to_utc=to_time)))
         for resp in self.stub.getHandler(req):
-            print(resp)
+            print(resp.datFragment.data.decode('utf-8'))
 
     def stream_putreq(self, recordlist):
+        """
+        Streams request to push data to server
+        """
+
         id = str(uuid.uuid1())
         yield Request(
-            fromSender="sender",
-            toReceiver="receiver",
+            fromSender=sender_ip,
+            toReceiver=receiver_ip,
             putRequest=PutRequest(
                 metaData=MetaData(uuid=id, mediaType=1),
                 datFragment=DatFragment(data=recordlist.encode())))
 
 
-
 def parse_and_push_files(path, clientobj):
+    """
+    Parses and streams push request
+    """
+
     if len(os.listdir(path)) == 0:
         print("No files in the directory to push....Exiting....\n")
     else:
@@ -58,6 +78,7 @@ def parse_and_push_files(path, clientobj):
         chunksProcessed = 0
         totalLines = 0
 
+        print("Logger : Streaming Push request to " + receiver_ip)
         for filename in os.listdir(path):
             print(filename)
             with open(path+filename, "r") as f:
@@ -65,10 +86,14 @@ def parse_and_push_files(path, clientobj):
                 totalLines = len(lines)
                 for i in range(4, len(lines)):
                     if len(lines[i]) != 0:
+
+                        #Old format with spaces
+                        #requestPayload += lines[i]
+                        #TODO: Uncomment this when parsing logic is changed.
                         requestPayload += format_data(lines[i]) + '\n'
                         chunkSize += 1
                         if chunkSize == maxChunkSize or i == len(lines)-1:
-                            chunkSize = 0;
+                            chunkSize = 0
                             iterator = clientobj.stream_putreq(recordlist=requestPayload)
                             resp = clientobj.stub.putHandler(iterator)
                             print(resp.msg)
@@ -80,12 +105,20 @@ def parse_and_push_files(path, clientobj):
 
 
 def format_data(line):
+    """
+    Formats data input to send in the request
+    """
+
     cols = line.split()
-    timestamp_utc = format_timestamp(cols[1])
-    return ",".join(cols[:1] + [timestamp_utc] + cols[2:])
+    timestamp = format_timestamp(cols[1])
+    return ",".join(cols[:1] + [timestamp] + cols[2:])
 
 
 def format_timestamp(timestamp):
+    """
+    Formats timestamp for request
+    """
+
     tuples = timestamp.split('/')
     year = tuples[0][:4]
     month = tuples[0][4:6]
@@ -94,7 +127,6 @@ def format_timestamp(timestamp):
     minute = tuples[1][2:4]
 
     return '%s-%s-%s %s:%s:00' % (year, month, day, hour, minute)
-
 
 
 def main():
@@ -118,7 +150,8 @@ def main():
             #clientobj.get(from_time="2018-03-21 01:00:00", to_time="2018-03-21 01:20:00")
 
         if sys.argv[1] == "put":
-            print("Enter the folder location where you have the files to be pushed (Please enter the path in quotes) :")
+            print("Enter the folder location where you have the files to be pushed (Please enter the path in quotes). "
+                  "Please note this python client only accepts mesowest files  :")
             path = str(input())
             print(path)
             parse_and_push_files(path, clientobj)
