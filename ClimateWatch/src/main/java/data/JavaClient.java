@@ -49,10 +49,38 @@ public class JavaClient
                 String from_time = scanner.nextLine();
                 System.out.print("\nEnter to_time 'yyyy-MM-dd HH:mm:ss': ");
                 String to_time = scanner.nextLine();
+                System.out.print("\nEnter the total number of filter parameters: ");
+                int param = scanner.nextInt();
+                String param_json = "";
+
+                if (param > 0){
+                    param_json += "[";
+                    for (int i = 0; i < param; i++){
+                        param_json += "{'lhs':'";
+                        System.out.print("\nEnter the parameter " + (i + 1) + " name : ");
+                        String name = scanner.nextLine();
+                        param_json += name + "', 'op':'";
+                        System.out.print("\nEnter the parameter " + (i + 1) + " operator : ");
+                        String op = scanner.nextLine();
+                        param_json += op + "', 'rhs':'";
+                        System.out.print("\nEnter the parameter " + (i + 1) + " value : ");
+                        String value = scanner.nextLine();
+                        if (i == (param - 1)){
+                            param_json += value + "'}";
+                        }
+                        else {
+                            param_json += value + "'},";
+                        }
+                    }
+                    param_json += "]";
+                    //System.out.println("Params json = " + param_json);
+                }
+
 
                 QueryParams queryParams = QueryParams.newBuilder()
                         .setFromUtc(from_time)
                         .setToUtc(to_time)
+                        .setParamsJson(param_json)
                         //.setFromUtc("2017/01/01 00:00:00") *** Test for data not present
                         // .setToUtc("2018/01/01 00:00:00")
                         .build();
