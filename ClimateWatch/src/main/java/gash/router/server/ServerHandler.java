@@ -106,7 +106,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
 		        //System.out.println(cursor.next());
 		        resp += String.valueOf(cursor.next())+" \n";
 		    }*/
-			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, "");
+			List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, filters[2]);
 			for (int i = 0; i < responseData.size(); i++) {
 				                               //System.out.println(responseData.get(i).toString());
 				                               //ctx.writeAndFlush("SERVERRESPONSE");
