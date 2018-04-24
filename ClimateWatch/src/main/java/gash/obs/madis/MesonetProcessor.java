@@ -70,7 +70,7 @@ public class MesonetProcessor
         String name = dataSource.getName().substring(0, dataSource.getName().lastIndexOf("."));
         ;
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd_HHmm");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd/HHmm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DateTime dt = formatter.parseDateTime(name);
 
         // filters
