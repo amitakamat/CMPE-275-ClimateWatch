@@ -1,3 +1,9 @@
+/**
+ * Class to test grpc service methods
+ * This class is used to test the rc method calls - ping, GET, PUT to server.
+ * Amita Vasudev Kamat
+ */
+
 package com.service.grpc;
 
 import java.text.SimpleDateFormat;

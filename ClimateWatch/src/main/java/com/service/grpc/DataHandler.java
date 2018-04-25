@@ -1,3 +1,9 @@
+/**
+ * Class to handle HTTP request
+ * This class is used to handle the HTTP get request and send back the response in json format..
+ * Amita Vasudev Kamat
+ */
+
 package com.service.grpc;
 import java.util.ArrayList;
 import io.grpc.stub.StreamObserver;

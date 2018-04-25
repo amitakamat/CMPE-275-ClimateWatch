@@ -1,3 +1,10 @@
+/**
+ * Class to handle the grpc requests
+ * This class handles and implements all the grpc methods. It gets the requests, processes it by sending it to other nodes via netty
+ * and sends back appropriate response to the client.
+ * Amita Vasudev Kamat
+ */
+
 package com.service.grpc;
 
 import io.grpc.stub.StreamObserver;
@@ -51,13 +58,7 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		this.nodeNo=0;
 		
 	}
-	
-	/*	int rr=0;
-	 	onRecievingMesg
-	 		mc = new MessageClient(otherNodes.get(i%otherNodes.size()),4568);
-	 		mc.postMessage(mesg);
-	 		rr++;
-	 */
+
 	
 	public void ping(Request request,
           StreamObserver<Response> responseObserver) {
@@ -112,9 +113,9 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 								if(pc.qList.size()!=0){
 									chks.hasData=true;
 									chks.hasDataVal=1;
-									System.out.println("removing and sending out last mesg");   
+									System.out.println("Received a record. Sending it in response.");   
 									//System.out.println(pc.qList.remove(0));	
-									final String responseMsg1 = "Data not present";	   
+									final String responseMsg1 = "Data present";	   
 								      
 								       MetaData metadata = MetaData.newBuilder()
 								   		          .setUuid("")
@@ -259,33 +260,6 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
     public StreamObserver<Request> putHandler(final StreamObserver<Response> responseObserver) {
     	System.out.println("Received a PUT request");
 	    
-	    System.out.println();
-	   // File f = new File("//mnt//c//");
-	    //System.out.println("Printing the total space");
-	    //System.out.println(f.getTotalSpace()/1000000.00 +" Megabytes");
-//	    ArrayList<String> clusterLeaders = new ArrayList<String>();
-//    	clusterLeaders.add("169.254.204.172");
-//    	//System.out.println("My IP : " + pc.ip);
-//    	System.out.println(clusterLeaders);
-//    	try {
-//	    	/*ArrayList<String> clusterLeaders = new DataHandler().getClusterLeaders();*/
-//	    	//for(int i=0; i<clusterLeaders.size(); i++) {
-//	    		//if(!clusterLeaders.get(i).equals(pc.ip)){
-//	    			//System.out.println("My IP : " + pc.ip);
-//	    			ClusterClient c = new ClusterClient(clusterLeaders.get(0));
-//	    			//c.putRequest(request);
-//	    			Response r = c.ping();
-//	    			System.out.println(r.getMsg());
-//	    			Thread.sleep(500);
-//	    			c.channelShutDown();
-//	    			//break;
-//	    		//}
-//	    	//}
-//    	} catch(Exception ex) {
-//    		System.out.println(ex.getMessage());
-//    	}
-	    
-	    
 	    return new StreamObserver<Request>() {
 		    int chunksReceived = 0;
 		    String sender = "";
@@ -296,27 +270,35 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		        	String receivedMessage = request.getPutRequest().getDatFragment().getData().toStringUtf8();
 		        	sender = request.getFromSender();
 		        	System.out.println(localnodes.size());
-	        		pc.mc = new MessageClient(localnodes.get(nodeNo%localnodes.size()),4568);
-	        		//pc.mc.postMessage(pc.addMessageTypeGETSPACE());
-		        		//TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
-						if(pc.qList_space.size()!=0){
-							//TimeUnit.SECONDS.sleep(2);
-							System.out.println("get response for space");
-							//responseMsg = pc.qList.remove(0);   
-							System.out.println(pc.qList.remove(0));	
-						}
+		        	// Check for space in all nodes.
+		        	/*for(int i=0; i<localnodes.size() ; i++) {
+		        		pc.mc = new MessageClient(localnodes.get(nodeNo%localnodes.size()),4568);
+		        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
+			        		TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
+							if(pc.qList_space.size()!=0){
+								TimeUnit.SECONDS.sleep(2);
+								System.out.println("get response for space");
+								//responseMsg = pc.qList.remove(0);   
+								System.out.println(pc.qList.remove(0));	
+								if(pc.qList.remove(0) == "True") {
+									pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
+					        		nodeNo++;
+					        		break;
+								}
+							}
+						nodeNo++;
+		        	}*/
+		        	
+		        	//Changes told by professor
 					if(++messageCount % 3 == 0) {
 						System.out.println("Message in multiple of 3");
-						//ArrayList<String> clusterLeaders =  new DataHandler().getClusterLeaders();
-						ArrayList<String> clusterLeaders = new ArrayList<String>();
-				    	clusterLeaders.add("169.254.225.179");
+						ArrayList<String> clusterLeaders =  new DataHandler().getClusterLeaders();
 						for(int i=0; i<clusterLeaders.size(); i++) {
 			        		if(!clusterLeaders.get(i).equals(pc.ip) && !clusterLeaders.get(i).equals(sender)){
-			        			//System.out.println("My IP : " + pc.ip);
 			        			ClusterClient c = new ClusterClient(clusterLeaders.get(i));
 			        			System.out.println("Sending ping to : " + clusterLeaders.get(i));
 			        			Response r = c.ping();
-			        			System.out.println(r.getMsg());
+			        			System.out.println("Message: " + r.getMsg());
 			        			if(r.getCode()== StatusCode.Ok) {
 			        				System.out.println("Sending push request to : " + clusterLeaders.get(i));
 				        			c.putRequest(request);
@@ -325,42 +307,13 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 				        			break;
 			        			}	        	
 			        		}
-			        	}
-						
+			        	}						
 					}
 					else {
 		        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
 		        		nodeNo++;
 					}
 	        		
-	        		/*If not
-	        		int noSpaceNodes = 1;
-		        	for(int i=0; i<localnodes.size()-1; i++){
-		        		nodeNo++;
-		        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
-		        		
-		        		If no space - noSpaceNodes++;
-		        		
-		        	}
-		        	if (nospacenodes == localnodes.size()){
-		        	// TODO: Test this functionality
-		        	/* If space not available on any node in the cluster*/
-		        	//ArrayList<String> clusterLeaders = new ArrayList<String>();
-//		        	clusterLeaders.add("169.254.204.172");
-		        	ArrayList<String> clusterLeaders = new DataHandler().getClusterLeaders();
-//		        	for(int i=0; i<clusterLeaders.size(); i++) {
-//		        		//if(!clusterLeaders.get(i).equals(pc.ip) && !clusterLeaders.get(i).equals(sender)){
-//		        			//System.out.println("My IP : " + pc.ip);
-//		        			ClusterClient c = new ClusterClient(clusterLeaders.get(i));
-//		        			c.putRequest(request);
-//		        			//Response r = c.ping();
-//		        			//System.out.println(r.getMsg());
-//		        			Thread.sleep(500);
-//		        			c.channelShutDown();
-//		        			break;
-//		        		//}
-//		        	}
-//	        	}
 		    	    System.out.println("Received request : "+ receivedMessage);
 		    	    chunksReceived++;
 		    	    

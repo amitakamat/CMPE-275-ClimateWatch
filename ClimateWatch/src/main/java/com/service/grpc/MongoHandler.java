@@ -1,3 +1,9 @@
+/**
+ * Class to handle MongoDB interactions
+ * This class is used to connect to MongoDB collection, store the data and fetch the data using queries
+ * Amita Vasudev Kamat
+ */
+
 package com.service.grpc;
 
 import java.text.SimpleDateFormat;
@@ -40,7 +46,7 @@ public class MongoHandler {
 	 * a request was received from the client. Here we extract the from and to date time,
 	 * query the database to fetch records based on the query and display it.
 	 * 
-	 * @param from, to
+	 * @param from, to, parameters(additional filters)
 	 *            The message request parameters received
 	 */
 	public List<DBObject> queryDB(Date fromTime, Date toTime, String parameters) {
@@ -74,6 +80,7 @@ public class MongoHandler {
 	
 	public static void main(String[] args) {
 		try {
+			//Test querying based on multiple parameters.
 			Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2018-03-21 01:00:00");
 			Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2018-03-21 22:20:00");
 			new MongoHandler().queryDB(fromTime, toTime, "[{'lhs': 'station', 'op': 'eq', 'rhs': 'CRN'}, {'lhs': 'temperature', 'op': 'eq', 'rhs': '38.35'}]");

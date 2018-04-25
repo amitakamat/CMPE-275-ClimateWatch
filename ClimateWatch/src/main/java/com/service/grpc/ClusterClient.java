@@ -1,3 +1,9 @@
+/**
+ * Class to make grpc calls to other cluster leaders.
+ * This class is used send or forward requests to other clusters when the data required is not in our cluster or there is no enough space to store the data
+ * Amita Vasudev Kamat
+ */
+
 package com.service.grpc;
 
 import java.text.SimpleDateFormat;

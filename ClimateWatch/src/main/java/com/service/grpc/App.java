@@ -1,3 +1,9 @@
+/**
+ * Class to start the grpc server
+ * This class is used to connect, start and stop the grpc server.
+ * Amita Vasudev Kamat
+ */
+
 package com.service.grpc;
 
 import java.io.IOException;
@@ -19,13 +25,13 @@ public class App
 	    /* The port on which the server should run */
 	    int grpcport = 8080;
 	   // int httpport = 8000;
-	   // server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
 	    
 	    server = ServerBuilder.forPort(grpcport)
 	        	.addService(new CommunicationServiceImpl(pc))
 	        	.build();
 	    server.start();
 	     
+	    // This code is for HTTP server for get request. It is commented as we used grpc for client as well.
 	    /*HttpServer httpserver = HttpServer.create(new InetSocketAddress(httpport), 0);
 	    httpserver.createContext("/v1/getbydate", new DataHandler());
 	    httpserver.setExecutor(null); 
@@ -49,7 +55,6 @@ public class App
 	    /* The port on which the server should run */
 	    int grpcport = 8080;
 	   // int httpport = 8000;
-	   // server = ServerBuilder.forPort(port).addService((BindableService) new CommunicationServiceImpl()).build();
 	    
 	    server = ServerBuilder.forPort(grpcport)
 	        	.addService(new CommunicationServiceImpl())
