@@ -12,8 +12,8 @@ import os
 import uuid
 
 # Update this with your IP and server IP before running the client
-sender_ip = '127.0.0.1'
-receiver_ip = '127.0.0.1'
+sender_ip = '169.254.198.56'
+receiver_ip = '169.254.198.56'
 
 
 class client(object):

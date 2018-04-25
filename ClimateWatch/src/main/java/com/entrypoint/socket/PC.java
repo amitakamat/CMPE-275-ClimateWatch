@@ -127,7 +127,8 @@ public class PC extends Node implements CommListener {
 	public void putIdIP() {
 		// Update redis
 		Random rand = new Random();
-		int n = rand.nextInt(1000) + 1;
+		//int n = rand.nextInt(1000) + 1;
+		int n = 1001;
 		jedis.hset("IP-Map", String.valueOf(n), this.ip);
 	}
 

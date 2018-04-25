@@ -36,10 +36,11 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 	protected static MongoClient mongoClient;
 	protected static DBCollection dbCollection; 
 	static String[] headers = {"STN", "WeatherDate", "MNET", "SLAT", "SLON", "SELV", "TMPF", "SKNT", "DRCT", "GUST", "PMSL", "ALTI", "DWPF", "RELH", "WTHR", "P24I"};
-	static int maxChunkSize = 10;
+	static int maxChunkSize = 1000;
 	private List<String> localnodes;
 	private PC pc;
 	private int nodeNo;
+	private long messageCount = 0;
 	
 	public CommunicationServiceImpl(){
 		
@@ -296,18 +297,41 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 		        	sender = request.getFromSender();
 		        	System.out.println(localnodes.size());
 	        		pc.mc = new MessageClient(localnodes.get(nodeNo%localnodes.size()),4568);
-	        		pc.mc.postMessage(pc.addMessageTypeGETSPACE());
-		        		TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
+	        		//pc.mc.postMessage(pc.addMessageTypeGETSPACE());
+		        		//TimeUnit.MILLISECONDS.sleep(5);//SECONDS.sleep(0.5);
 						if(pc.qList_space.size()!=0){
 							//TimeUnit.SECONDS.sleep(2);
 							System.out.println("get response for space");
 							//responseMsg = pc.qList.remove(0);   
 							System.out.println(pc.qList.remove(0));	
 						}
+					if(++messageCount % 3 == 0) {
+						System.out.println("Message in multiple of 3");
+						//ArrayList<String> clusterLeaders =  new DataHandler().getClusterLeaders();
+						ArrayList<String> clusterLeaders = new ArrayList<String>();
+				    	clusterLeaders.add("169.254.225.179");
+						for(int i=0; i<clusterLeaders.size(); i++) {
+			        		if(!clusterLeaders.get(i).equals(pc.ip) && !clusterLeaders.get(i).equals(sender)){
+			        			//System.out.println("My IP : " + pc.ip);
+			        			ClusterClient c = new ClusterClient(clusterLeaders.get(i));
+			        			System.out.println("Sending ping to : " + clusterLeaders.get(i));
+			        			Response r = c.ping();
+			        			System.out.println(r.getMsg());
+			        			if(r.getCode()== StatusCode.Ok) {
+			        				System.out.println("Sending push request to : " + clusterLeaders.get(i));
+				        			c.putRequest(request);
+				        			Thread.sleep(500);
+				        			c.channelShutDown();
+				        			break;
+			        			}	        	
+			        		}
+			        	}
 						
-	        		// If has space
-	        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
-	        		nodeNo++;
+					}
+					else {
+		        		pc.mc.postMessage(pc.addMessageTypePUTQUERY(receivedMessage));
+		        		nodeNo++;
+					}
 	        		
 	        		/*If not
 	        		int noSpaceNodes = 1;

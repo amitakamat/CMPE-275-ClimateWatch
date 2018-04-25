@@ -147,7 +147,7 @@ public class ServerHandler extends /*SimpleChannelInboundHandler<Route>*/ Channe
     	String line;
     	StringBuffer stringBuffer = new StringBuffer();
     	
-    	while(/*entries[lineNo]!=null*/lineNo<10){
+    	while(entries[lineNo]!=null){
     		line=entries[lineNo];
 			if(line.length()!=0) {
 				stringBuffer.append(line);

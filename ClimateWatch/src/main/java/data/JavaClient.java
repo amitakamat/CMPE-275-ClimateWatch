@@ -19,8 +19,8 @@ public class JavaClient
         String task = scanner.nextLine();
         
         /* Update this before running client */
-        String sender_ip = "127.0.0.1";
-        String receiver_ip = "127.0.0.1";
+        String sender_ip = "169.254.198.56";
+        String receiver_ip = "169.254.134.186";
         
 
 
