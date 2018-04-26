@@ -25,7 +25,7 @@ public class MesonetProcessor
      */
     public static final String sGeneralTag = "madis-mesonet";
 
-    int maxChunkSize = 10;
+    int maxChunkSize = 1000;
     int chunkSize = 0;
     StringBuilder requestPayload = new StringBuilder();
     StreamObserver<Request> requestObs;
