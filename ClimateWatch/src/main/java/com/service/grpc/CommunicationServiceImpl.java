@@ -87,7 +87,8 @@ public class CommunicationServiceImpl extends CommunicationServiceGrpc.Communica
 				//List<DBObject> responseData = new MongoHandler().queryDB(fromTime, toTime, params.getParamsJson());
 				System.out.println(params.getParamsJson());
 				for(int i=0;i<localnodes.size();i++){	
-	        		pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
+	        		//pc.mc = new MessageClient(localnodes.get(i%localnodes.size()),4568);
+	        		pc.mc.commConnection.bs.connect(localnodes.get(i%localnodes.size()),4568);
 	        		pc.mc.addListener(pc);
 	        		pc.mc.postMessage(pc.addMessageTypeGETQUERY(params.getFromUtc()+"and"+params.getToUtc()+"and"+params.getParamsJson()));
 	        	}
